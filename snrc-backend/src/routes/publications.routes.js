@@ -1,0 +1,17 @@
+import { Router } from "express";
+import { PublicationsController } from "../controllers/publications.controller.js";
+import { publicationValidator } from "../validators/publications.validator.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireRole } from "../middlewares/requireRole.js";
+import { sanitizeHtmlFields } from "../middlewares/sanitizeHtmlFields.js";
+const router = Router();
+router.get("/publications", asyncHandler(PublicationsController.getPublic));
+router.get("/publications/:slug", asyncHandler(PublicationsController.getPublicBySlug));
+router.get("/publication-categories", asyncHandler(PublicationsController.getCategories));
+router.get("/admin/publications", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(PublicationsController.getAll));
+router.post("/admin/publications", requireAuth, requireRole("superadmin","admin_editeur"), sanitizeHtmlFields("description"), publicationValidator, validateRequest, asyncHandler(PublicationsController.create));
+router.put("/admin/publications/:id", requireAuth, requireRole("superadmin","admin_editeur"), sanitizeHtmlFields("description"), publicationValidator, validateRequest, asyncHandler(PublicationsController.update));
+router.delete("/admin/publications/:id", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(PublicationsController.remove));
+export default router;

@@ -1,0 +1,14 @@
+import { Router } from "express";
+import { MessagesController } from "../controllers/messages.controller.js";
+import { contactMessageValidator } from "../validators/message.validator.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireRole } from "../middlewares/requireRole.js";
+const router = Router();
+router.post("/contact", contactMessageValidator, validateRequest, asyncHandler(MessagesController.contact));
+router.get("/admin/messages", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(MessagesController.getAll));
+router.get("/admin/messages/:id", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(MessagesController.getById));
+router.patch("/admin/messages/:id/read", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(MessagesController.markAsRead));
+router.delete("/admin/messages/:id", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(MessagesController.remove));
+export default router;

@@ -1,0 +1,15 @@
+import { Router } from "express";
+import { PagesController } from "../controllers/pages.controller.js";
+import { pageValidator } from "../validators/pages.validator.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireRole } from "../middlewares/requireRole.js";
+import { sanitizeHtmlFields } from "../middlewares/sanitizeHtmlFields.js";
+const router = Router();
+router.get("/pages/:slug", asyncHandler(PagesController.getPublicBySlug));
+router.get("/admin/pages", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(PagesController.getAll));
+router.post("/admin/pages", requireAuth, requireRole("superadmin","admin_editeur"), sanitizeHtmlFields("content"), pageValidator, validateRequest, asyncHandler(PagesController.create));
+router.put("/admin/pages/:id", requireAuth, requireRole("superadmin","admin_editeur"), sanitizeHtmlFields("content"), pageValidator, validateRequest, asyncHandler(PagesController.update));
+router.delete("/admin/pages/:id", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(PagesController.remove));
+export default router;

@@ -1,0 +1,16 @@
+import { Router } from "express";
+import { NewsController } from "../controllers/news.controller.js";
+import { newsValidator } from "../validators/news.validator.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireRole } from "../middlewares/requireRole.js";
+import { sanitizeHtmlFields } from "../middlewares/sanitizeHtmlFields.js";
+const router = Router();
+router.get("/news", asyncHandler(NewsController.getPublic));
+router.get("/news/:slug", asyncHandler(NewsController.getPublicBySlug));
+router.get("/admin/news", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(NewsController.getAll));
+router.post("/admin/news", requireAuth, requireRole("superadmin","admin_editeur"), sanitizeHtmlFields("content"), newsValidator, validateRequest, asyncHandler(NewsController.create));
+router.put("/admin/news/:id", requireAuth, requireRole("superadmin","admin_editeur"), sanitizeHtmlFields("content"), newsValidator, validateRequest, asyncHandler(NewsController.update));
+router.delete("/admin/news/:id", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(NewsController.remove));
+export default router;

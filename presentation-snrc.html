@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SNRC — Plateforme institutionnelle numérique</title>
+<style>
+  :root {
+    --paper: #faf9f5;
+    --surface: #ffffff;
+    --surface-2: #f2f0e9;
+    --ink: #161b2e;
+    --ink-soft: #3c3f52;
+    --muted: #706e64;
+    --line: #e6e2d6;
+    --blue: #2446a6;
+    --blue-deep: #16306f;
+    --gold: #b9852a;
+    --gold-bg: #f7ecd4;
+    --red: #c22430;
+    --shadow: 0 24px 60px -32px rgba(20, 24, 46, 0.35);
+    --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --display: "Segoe UI Semibold", "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #10131e;
+      --surface: #161a29;
+      --surface-2: #1d2233;
+      --ink: #edeef5;
+      --ink-soft: #c4c7d8;
+      --muted: #8d90a4;
+      --line: #2b2f42;
+      --blue: #7695e8;
+      --blue-deep: #cddafb;
+      --gold: #e6bc61;
+      --gold-bg: #332a13;
+      --red: #f08a86;
+      --shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #10131e;
+    --surface: #161a29;
+    --surface-2: #1d2233;
+    --ink: #edeef5;
+    --ink-soft: #c4c7d8;
+    --muted: #8d90a4;
+    --line: #2b2f42;
+    --blue: #7695e8;
+    --blue-deep: #cddafb;
+    --gold: #e6bc61;
+    --gold-bg: #332a13;
+    --red: #f08a86;
+    --shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.6);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+
+  .tricolor {
+    height: 5px;
+    background: linear-gradient(90deg, var(--blue) 0 33.33%, var(--gold) 33.33% 66.66%, var(--red) 66.66% 100%);
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+  .wrap-narrow { max-width: 760px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    padding: 96px 0 110px;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -220px;
+    right: -160px;
+    width: 620px;
+    height: 620px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--blue) 16%, transparent), transparent 70%);
+    pointer-events: none;
+  }
+
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blue-deep);
+  }
+  .kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(34px, 5.4vw, 58px);
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+    margin: 22px 0 20px;
+    max-width: 15ch;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--blue);
+  }
+
+  .hero .lede {
+    font-size: 18px;
+    color: var(--ink-soft);
+    max-width: 56ch;
+    margin: 0 0 40px;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .pill {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-soft);
+  }
+
+  /* ---------- SECTION SCAFFOLDING ---------- */
+  section { padding: 84px 0; }
+  section.tight { padding: 56px 0; }
+  section + section { border-top: 1px solid var(--line); }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 22px;
+    height: 2px;
+    background: var(--gold);
+  }
+
+  h2.section-title {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(26px, 3.4vw, 38px);
+    letter-spacing: -0.01em;
+    margin: 14px 0 18px;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  p.section-lede {
+    font-size: 16.5px;
+    color: var(--ink-soft);
+    max-width: 68ch;
+    margin: 0 0 8px;
+  }
+
+  /* ---------- OVERVIEW STATS ---------- */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 44px;
+  }
+  .stat {
+    background: var(--surface);
+    padding: 28px 22px;
+  }
+  .stat .n {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 34px;
+    color: var(--blue);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .l {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  @media (max-width: 720px) {
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ---------- SITE MAP ---------- */
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 40px;
+  }
+  @media (max-width: 860px) { .map-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .map-grid { grid-template-columns: 1fr; } }
+
+  .map-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 20px 22px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .map-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--blue) 35%, var(--line)); }
+
+  .map-card .idx {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .map-card h3 {
+    font-family: var(--display);
+    font-size: 16.5px;
+    font-weight: 700;
+    margin: 8px 0 6px;
+    color: var(--ink);
+  }
+  .map-card p { font-size: 13.5px; color: var(--muted); margin: 0; line-height: 1.5; }
+
+  .map-card.is-new {
+    border-color: color-mix(in srgb, var(--gold) 55%, var(--line));
+    background: linear-gradient(180deg, var(--gold-bg), var(--surface) 60%);
+  }
+  .map-card.is-new .badge {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+
+  /* ---------- QUOTE ---------- */
+  .quote-block {
+    background: var(--blue);
+    color: #fff;
+    border-radius: 22px;
+    padding: 46px 48px;
+    margin-top: 46px;
+    position: relative;
+    overflow: hidden;
+  }
+  .quote-block::after {
+    content: "";
+    position: absolute;
+    right: -60px;
+    bottom: -80px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--gold) 40%, transparent);
+    opacity: 0.25;
+  }
+  .quote-block blockquote {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(19px, 2.4vw, 25px);
+    line-height: 1.45;
+    max-width: 62ch;
+    text-wrap: balance;
+    position: relative;
+  }
+  .quote-block cite {
+    display: block;
+    margin-top: 18px;
+    font-style: normal;
+    font-size: 13px;
+    color: color-mix(in srgb, white 75%, var(--gold));
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- TWO COL FEATURE ---------- */
+  .feature {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 56px;
+    align-items: start;
+    margin-top: 40px;
+  }
+  @media (max-width: 800px) { .feature { grid-template-columns: 1fr; gap: 32px; } }
+
+  .feature-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .feature-list li {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 14px;
+    padding: 16px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .feature-list li:first-child { border-top: 1px solid var(--line); }
+  .feature-list .ico {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--blue);
+  }
+  .feature-list h4 { margin: 0 0 3px; font-size: 15px; font-weight: 700; }
+  .feature-list p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+
+  .flow-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 30px 32px;
+    box-shadow: var(--shadow);
+  }
+  .flow-card h4 {
+    font-family: var(--display);
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 0 0 22px;
+  }
+  .flow-steps { display: flex; flex-direction: column; }
+  .flow-step {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 14px;
+    position: relative;
+    padding-bottom: 26px;
+  }
+  .flow-step:last-child { padding-bottom: 0; }
+  .flow-step::before {
+    content: "";
+    position: absolute;
+    left: 12px; top: 26px; bottom: 0;
+    width: 2px;
+    background: var(--line);
+  }
+  .flow-step:last-child::before { display: none; }
+  .flow-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--blue); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; font-family: var(--mono);
+    z-index: 1;
+  }
+  .flow-step:nth-child(4) .flow-dot, .flow-step:nth-child(5) .flow-dot { background: var(--gold); }
+  .flow-step strong { display: block; font-size: 14.5px; margin-bottom: 2px; }
+  .flow-step span { font-size: 13px; color: var(--muted); }
+
+  /* ---------- WHY GRID (raisons) ---------- */
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin-top: 40px;
+  }
+  @media (max-width: 760px) { .why-grid { grid-template-columns: 1fr; } }
+
+  .why-card {
+    padding: 26px 26px 28px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--blue);
+  }
+  .why-card:nth-child(2) { border-left-color: var(--gold); }
+  .why-card:nth-child(3) { border-left-color: var(--red); }
+  .why-card:nth-child(4) { border-left-color: var(--blue); }
+  .why-card:nth-child(5) { border-left-color: var(--gold); }
+  .why-card:nth-child(6) { border-left-color: var(--red); }
+
+  .why-card .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .why-card h4 {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 700;
+    margin: 10px 0 8px;
+    color: var(--ink);
+  }
+  .why-card p { margin: 0; font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+
+  /* ---------- TIMELINE (closing / next steps) ---------- */
+  .closing {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .closing .eyebrow { color: var(--gold); }
+  .closing h2.section-title { color: #fff; }
+  .closing p.section-lede { color: color-mix(in srgb, white 78%, var(--ink)); }
+
+  .next-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 40px;
+  }
+  @media (max-width: 760px) { .next-list { grid-template-columns: 1fr; } }
+  .next-card {
+    background: color-mix(in srgb, white 6%, transparent);
+    border: 1px solid color-mix(in srgb, white 14%, transparent);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .next-card .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .next-card h4 { margin: 10px 0 6px; font-size: 15.5px; font-family: var(--display); }
+  .next-card p { margin: 0; font-size: 13.5px; color: color-mix(in srgb, white 70%, var(--ink)); line-height: 1.55; }
+
+  footer.colophon {
+    padding: 34px 0 50px;
+    text-align: center;
+    font-size: 12.5px;
+    color: color-mix(in srgb, white 55%, var(--ink));
+  }
+
+  ::selection { background: color-mix(in srgb, var(--gold) 40%, transparent); }
+</style>
+</head>
+<body>
+
+<div class="tricolor"></div>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker"><span class="dot"></span>Présentation institutionnelle · Plateforme numérique SNRC</span>
+    <h1>Le site officiel de la SNRC, <em>d'une vitrine institutionnelle à une plateforme de services.</em></h1>
+    <p class="lede">
+      La Société Nationale de Recouvrement des Créances dispose aujourd'hui d'un site public complet,
+      d'un back-office de gestion de contenu et, depuis cette évolution, d'un module de recrutement en ligne
+      de bout en bout — de l'offre publiée jusqu'à la candidature reçue.
+    </p>
+    <div class="hero-meta">
+      <span class="pill">9 rubriques publiques</span>
+      <span class="pill">10 espaces d'administration</span>
+      <span class="pill">snrc.td · N'Djamena, Tchad</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ OVERVIEW ============ -->
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Vue d'ensemble</span>
+    <h2 class="section-title">Une institution publique, un site à son image</h2>
+    <p class="section-lede">
+      Le site s'adresse à deux publics distincts avec deux expériences dédiées : une vitrine publique pensée
+      pour l'information et la transparence, et un espace d'administration sécurisé pour les équipes de la SNRC,
+      qui gardent la main sur chaque contenu publié sans dépendre d'une intervention technique.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="n">9</div>
+        <div class="l">Rubriques publiques — de l'Accueil aux Carrières</div>
+      </div>
+      <div class="stat">
+        <div class="n">10</div>
+        <div class="l">Modules d'administration, avec rôles et permissions</div>
+      </div>
+      <div class="stat">
+        <div class="n">2</div>
+        <div class="l">Types de dépôts gérés : documents institutionnels &amp; candidatures</div>
+      </div>
+      <div class="stat">
+        <div class="n">100%</div>
+        <div class="l">Contenu pilotable depuis l'admin, sans redéploiement</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SITE MAP ============ -->
+<section class="tight">
+  <div class="wrap">
+    <span class="eyebrow">Le site en un coup d'œil</span>
+    <h2 class="section-title">Neuf rubriques, une seule ligne éditoriale</h2>
+    <p class="section-lede">
+      Chaque rubrique répond à un besoin précis du public : comprendre l'institution, suivre son actualité,
+      consulter ses publications officielles, ou — désormais — postuler à une offre d'emploi.
+    </p>
+
+    <div class="map-grid">
+      <div class="map-card">
+        <span class="idx">01</span>
+        <h3>Accueil</h3>
+        <p>Présentation institutionnelle, chiffres clés et mise en avant du mandat de la SNRC.</p>
+      </div>
+      <div class="map-card">
+        <span class="idx">02</span>
+        <h3>La SNRC</h3>
+        <p>Cadre juridique, décret constitutif et positionnement de l'institution.</p>
+      </div>
+      <div class="map-card">
+        <span class="idx">03</span>
+        <h3>Missions</h3>
+        <p>Recouvrement des créances en difficulté et assainissement du système financier national.</p>
+      </div>
+      <div class="map-card">
+        <span class="idx">04</span>
+        <h3>Services</h3>
+        <p>Recouvrement, liquidation amiable, gestion de créances confiées par l'État.</p>
+      </div>
+      <div class="map-card">
+        <span class="idx">05</span>
+        <h3>Actualités</h3>
+        <p>Communiqués et vie institutionnelle, avec fiche dédiée par actualité.</p>
+      </div>
+      <div class="map-card">
+        <span class="idx">06</span>
+        <h3>Publications</h3>
+        <p>Rapports, notes et documents officiels classés par catégorie.</p>
+      </div>
+      <div class="map-card is-new">
+        <span class="idx">07</span>
+        <h3>Carrières</h3>
+        <p>Offres d'emploi publiées par l'administration et candidature en ligne avec CV.</p>
+        <span class="badge">Nouveau module</span>
+      </div>
+      <div class="map-card">
+        <span class="idx">08</span>
+        <h3>FAQ</h3>
+        <p>Réponses aux questions les plus fréquentes sur l'institution et ses services.</p>
+      </div>
+      <div class="map-card">
+        <span class="idx">09</span>
+        <h3>Contact</h3>
+        <p>Formulaire institutionnel et coordonnées officielles de la SNRC.</p>
+      </div>
+    </div>
+
+    <div class="quote-block">
+      <blockquote>
+        « La SNRC accompagne les pouvoirs publics dans la gestion, le suivi et le recouvrement des créances,
+        et contribue à renforcer la discipline financière, la redevabilité et la mobilisation des ressources. »
+      </blockquote>
+      <cite>— Positionnement institutionnel, page d'accueil du site</cite>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NEW MODULE ============ -->
+<section id="module">
+  <div class="wrap">
+    <span class="eyebrow">La nouvelle intégration</span>
+    <h2 class="section-title">Le recrutement, désormais géré de bout en bout</h2>
+    <p class="section-lede">
+      Jusqu'ici, toute campagne de recrutement passait par des canaux externes et un traitement manuel des
+      candidatures. Le site intègre maintenant un module complet : publication des offres, dépôt de candidature
+      avec CV, et suivi centralisé — sans quitter l'écosystème SNRC.
+    </p>
+
+    <div class="feature">
+      <ul class="feature-list">
+        <li>
+          <span class="ico">01</span>
+          <div><h4>Publication d'offres</h4><p>Intitulé, type de contrat, lieu, date limite, profil recherché — gérés depuis l'admin, comme une actualité.</p></div>
+        </li>
+        <li>
+          <span class="ico">02</span>
+          <div><h4>Candidature en ligne</h4><p>Formulaire public avec CV obligatoire, lettre de motivation (texte ou fichier) et niveau d'étude.</p></div>
+        </li>
+        <li>
+          <span class="ico">03</span>
+          <div><h4>Centralisation sécurisée</h4><p>Chaque candidature et chaque document déposé est rattaché à l'offre concernée, consultable par les équipes autorisées.</p></div>
+        </li>
+        <li>
+          <span class="ico">04</span>
+          <div><h4>Suivi de traitement</h4><p>Statut nouveau / lu / traité, réponse directe par email depuis la fiche candidature.</p></div>
+        </li>
+      </ul>
+
+      <div class="flow-card">
+        <h4>Parcours de bout en bout</h4>
+        <div class="flow-steps">
+          <div class="flow-step"><span class="flow-dot">1</span><div><strong>L'admin publie une offre</strong><span>Depuis « Recrutements », en quelques minutes.</span></div></div>
+          <div class="flow-step"><span class="flow-dot">2</span><div><strong>L'offre apparaît sur /carrieres</strong><span>Visible publiquement, avec date limite et lieu.</span></div></div>
+          <div class="flow-step"><span class="flow-dot">3</span><div><strong>Le candidat postule en ligne</strong><span>Formulaire + CV, sans compte à créer.</span></div></div>
+          <div class="flow-step"><span class="flow-dot">4</span><div><strong>La candidature arrive en admin</strong><span>Dans « Candidatures », rattachée à l'offre.</span></div></div>
+          <div class="flow-step"><span class="flow-dot">5</span><div><strong>L'équipe RH traite et répond</strong><span>CV téléchargeable, réponse en un clic.</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY ============ -->
+<section class="tight">
+  <div class="wrap">
+    <span class="eyebrow">Pourquoi cette évolution</span>
+    <h2 class="section-title">Les raisons qui ont motivé cette intégration</h2>
+    <p class="section-lede">
+      Ce module ne s'ajoute pas au hasard : il répond à des besoins concrets identifiés dans le fonctionnement
+      actuel des campagnes de recrutement de la SNRC.
+    </p>
+
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="num">Transparence</span>
+        <h4>Égalité d'accès aux opportunités</h4>
+        <p>Une institution publique se doit d'offrir un canal de candidature ouvert, unique et équitable à tous les candidats — sans dépendre d'un contact ou d'un canal informel.</p>
+      </div>
+      <div class="why-card">
+        <span class="num">Efficacité</span>
+        <h4>Fin de la collecte manuelle</h4>
+        <p>Les CV et lettres ne transitent plus par des boîtes email éparpillées : chaque candidature arrive structurée, horodatée et rattachée à la bonne offre.</p>
+      </div>
+      <div class="why-card">
+        <span class="num">Crédibilité</span>
+        <h4>Une image institutionnelle cohérente</h4>
+        <p>Publier ses offres sur son propre site, plutôt que sur des canaux tiers, renforce la crédibilité de la SNRC comme employeur et comme institution moderne.</p>
+      </div>
+      <div class="why-card">
+        <span class="num">Traçabilité</span>
+        <h4>Un historique exploitable</h4>
+        <p>Chaque candidature reste consultable et rattachée à son offre — utile pour le suivi RH comme pour d'éventuels contrôles administratifs.</p>
+      </div>
+      <div class="why-card">
+        <span class="num">Cohérence</span>
+        <h4>Extension naturelle de l'existant</h4>
+        <p>Le site gérait déjà actualités et publications avec le même principe éditorial : le recrutement en est le prolongement logique, pas un système parallèle.</p>
+      </div>
+      <div class="why-card">
+        <span class="num">Sobriété</span>
+        <h4>Un module pensé pour être utilisé</h4>
+        <p>Statuts simples (nouveau / lu / traité), formulaire court côté candidat : la solution reste volontairement légère plutôt que de reproduire un ERP RH complexe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLOSING ============ -->
+<section class="closing">
+  <div class="wrap">
+    <span class="eyebrow">Et maintenant</span>
+    <h2 class="section-title">Une plateforme prête à accompagner la SNRC</h2>
+    <p class="section-lede">
+      Le module est construit, vérifié de bout en bout et prêt pour la mise en ligne. Trois étapes restent
+      entre les mains des équipes SNRC pour qu'il prenne vie sur le site public.
+    </p>
+
+    <div class="next-list">
+      <div class="next-card">
+        <span class="tag">Étape 1</span>
+        <h4>Mise en ligne technique</h4>
+        <p>Déploiement du module sur l'infrastructure existante, sans interruption du site actuel.</p>
+      </div>
+      <div class="next-card">
+        <span class="tag">Étape 2</span>
+        <h4>Première campagne réelle</h4>
+        <p>Publication des véritables offres ouvertes par les équipes RH, depuis l'espace « Recrutements ».</p>
+      </div>
+      <div class="next-card">
+        <span class="tag">Étape 3</span>
+        <h4>Appropriation par les équipes</h4>
+        <p>Prise en main de l'espace « Candidatures » pour le traitement quotidien des dossiers reçus.</p>
+      </div>
+    </div>
+  </div>
+  <footer class="colophon">Société Nationale de Recouvrement des Créances — N'Djamena, République du Tchad</footer>
+</section>
+
+</body>
+</html>

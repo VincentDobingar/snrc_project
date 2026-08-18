@@ -1,0 +1,14 @@
+import { Router } from "express";
+import { AdminUsersController } from "../controllers/adminUsers.controller.js";
+import { createAdminUserValidator, updateAdminUserValidator, updatePasswordValidator } from "../validators/adminUsers.validator.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireRole } from "../middlewares/requireRole.js";
+const router = Router();
+router.get("/admin/users", requireAuth, requireRole("superadmin"), asyncHandler(AdminUsersController.getAll));
+router.post("/admin/users", requireAuth, requireRole("superadmin"), createAdminUserValidator, validateRequest, asyncHandler(AdminUsersController.create));
+router.put("/admin/users/:id", requireAuth, requireRole("superadmin"), updateAdminUserValidator, validateRequest, asyncHandler(AdminUsersController.update));
+router.patch("/admin/users/:id/password", requireAuth, requireRole("superadmin"), updatePasswordValidator, validateRequest, asyncHandler(AdminUsersController.updatePassword));
+router.delete("/admin/users/:id", requireAuth, requireRole("superadmin"), asyncHandler(AdminUsersController.remove));
+export default router;

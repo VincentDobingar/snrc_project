@@ -1,0 +1,15 @@
+import { Router } from "express";
+import { ServicesController } from "../controllers/services.controller.js";
+import { serviceValidator } from "../validators/services.validator.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireRole } from "../middlewares/requireRole.js";
+import { sanitizeHtmlFields } from "../middlewares/sanitizeHtmlFields.js";
+const router = Router();
+router.get("/services", asyncHandler(ServicesController.getPublic));
+router.get("/admin/services", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(ServicesController.getAll));
+router.post("/admin/services", requireAuth, requireRole("superadmin","admin_editeur"), sanitizeHtmlFields("content"), serviceValidator, validateRequest, asyncHandler(ServicesController.create));
+router.put("/admin/services/:id", requireAuth, requireRole("superadmin","admin_editeur"), sanitizeHtmlFields("content"), serviceValidator, validateRequest, asyncHandler(ServicesController.update));
+router.delete("/admin/services/:id", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(ServicesController.remove));
+export default router;

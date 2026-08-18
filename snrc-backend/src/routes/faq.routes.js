@@ -1,0 +1,14 @@
+import { Router } from "express";
+import { FAQController } from "../controllers/faq.controller.js";
+import { faqValidator } from "../validators/faq.validator.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireRole } from "../middlewares/requireRole.js";
+const router = Router();
+router.get("/faqs", asyncHandler(FAQController.getPublic));
+router.get("/admin/faqs", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(FAQController.getAll));
+router.post("/admin/faqs", requireAuth, requireRole("superadmin","admin_editeur"), faqValidator, validateRequest, asyncHandler(FAQController.create));
+router.put("/admin/faqs/:id", requireAuth, requireRole("superadmin","admin_editeur"), faqValidator, validateRequest, asyncHandler(FAQController.update));
+router.delete("/admin/faqs/:id", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(FAQController.remove));
+export default router;

@@ -1,0 +1,10 @@
+import { Router } from "express";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { UploadController } from "../controllers/upload.controller.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
+import { requireRole } from "../middlewares/requireRole.js";
+import { documentUpload, imageUpload } from "../middlewares/upload.js";
+const router = Router();
+router.post("/admin/uploads/image", requireAuth, requireRole("superadmin","admin_editeur"), imageUpload("images").single("file"), asyncHandler(UploadController.uploadImage));
+router.post("/admin/uploads/document", requireAuth, requireRole("superadmin","admin_editeur"), documentUpload("documents").single("file"), asyncHandler(UploadController.uploadDocument));
+export default router;

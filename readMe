@@ -1,0 +1,207 @@
+snrc-project/
+├── snrc-frontend/
+└── snrc-backend/
+
+npm create vite@latest snrc-frontend -- --template react
+cd snrc-frontend
+npm install
+
+npm install react-router-dom axios lucide-react react-helmet-async react-hook-form zod @hookform/resolvers clsx
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+cd ..
+
+mkdir snrc-backend
+cd snrc-backend
+npm init -y
+
+npm install express cors helmet morgan dotenv cookie-parser jsonwebtoken bcryptjs multer pg
+npm install express-validator slugify
+npm install -D nodemon
+
+
+### Architecture 
+
+snrc-frontend/
+├── public/
+│   ├── favicon.ico
+│   ├── images/
+│   │   ├── logo-snrc.png
+│   │   └── hero/
+│   └── documents/
+├── src/
+│   ├── api/
+│   │   ├── axios.js
+│   │   ├── authApi.js
+│   │   ├── pagesApi.js
+│   │   ├── newsApi.js
+│   │   ├── publicationsApi.js
+│   │   ├── faqApi.js
+│   │   ├── contactApi.js
+│   │   └── adminApi.js
+│   ├── app/
+│   │   ├── router.jsx
+│   │   └── providers.jsx
+│   ├── assets/
+│   ├── components/
+│   │   ├── ui/
+│   │   │   ├── Button.jsx
+│   │   │   ├── Container.jsx
+│   │   │   ├── SectionTitle.jsx
+│   │   │   ├── Card.jsx
+│   │   │   ├── Input.jsx
+│   │   │   ├── Textarea.jsx
+│   │   │   ├── Select.jsx
+│   │   │   ├── Badge.jsx
+│   │   │   ├── Loader.jsx
+│   │   │   └── EmptyState.jsx
+│   │   ├── layout/
+│   │   │   ├── Header.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   ├── MobileMenu.jsx
+│   │   │   ├── PageBanner.jsx
+│   │   │   ├── PublicLayout.jsx
+│   │   │   └── AdminLayout.jsx
+│   │   ├── home/
+│   │   │   ├── HeroSection.jsx
+│   │   │   ├── AboutIntroSection.jsx
+│   │   │   ├── MissionCardsSection.jsx
+│   │   │   ├── ServicesSection.jsx
+│   │   │   ├── StatsSection.jsx
+│   │   │   ├── LatestNewsSection.jsx
+│   │   │   ├── LatestPublicationsSection.jsx
+│   │   │   ├── QuickContactSection.jsx
+│   │   │   └── FinalCTASection.jsx
+│   │   ├── news/
+│   │   ├── publications/
+│   │   ├── faq/
+│   │   ├── contact/
+│   │   └── admin/
+│   ├── contexts/
+│   │   └── AuthContext.jsx
+│   ├── hooks/
+│   │   ├── useAuth.js
+│   │   └── usePageMeta.js
+│   ├── lib/
+│   │   ├── constants.js
+│   │   ├── helpers.js
+│   │   └── validators.js
+│   ├── pages/
+│   │   ├── public/
+│   │   │   ├── Home.jsx
+│   │   │   ├── About.jsx
+│   │   │   ├── Missions.jsx
+│   │   │   ├── Services.jsx
+│   │   │   ├── NewsList.jsx
+│   │   │   ├── NewsDetail.jsx
+│   │   │   ├── Publications.jsx
+│   │   │   ├── FAQ.jsx
+│   │   │   ├── Contact.jsx
+│   │   │   └── NotFound.jsx
+│   │   └── admin/
+│   │       ├── Login.jsx
+│   │       ├── Dashboard.jsx
+│   │       ├── PagesManager.jsx
+│   │       ├── NewsManager.jsx
+│   │       ├── NewsForm.jsx
+│   │       ├── PublicationsManager.jsx
+│   │       ├── PublicationForm.jsx
+│   │       ├── FAQManager.jsx
+│   │       ├── MessagesManager.jsx
+│   │       ├── AdminUsersManager.jsx
+│   │       └── SettingsManager.jsx
+│   ├── routes/
+│   │   ├── ProtectedRoute.jsx
+│   │   └── GuestRoute.jsx
+│   ├── styles/
+│   │   └── index.css
+│   ├── App.jsx
+│   └── main.jsx
+├── .env
+├── tailwind.config.js
+└── vite.config.js
+
+
+snrc-backend/
+├── src/
+│   ├── config/
+│   │   ├── db.js
+│   │   ├── env.js
+│   │   └── cors.js
+│   ├── controllers/
+│   │   ├── auth.controller.js
+│   │   ├── pages.controller.js
+│   │   ├── news.controller.js
+│   │   ├── publications.controller.js
+│   │   ├── faq.controller.js
+│   │   ├── messages.controller.js
+│   │   ├── adminUsers.controller.js
+│   │   ├── settings.controller.js
+│   │   └── upload.controller.js
+│   ├── middlewares/
+│   │   ├── requireAuth.js
+│   │   ├── requireRole.js
+│   │   ├── errorHandler.js
+│   │   ├── notFound.js
+│   │   ├── validateRequest.js
+│   │   └── upload.js
+│   ├── models/
+│   │   ├── auth.model.js
+│   │   ├── pages.model.js
+│   │   ├── news.model.js
+│   │   ├── publications.model.js
+│   │   ├── faq.model.js
+│   │   ├── messages.model.js
+│   │   ├── adminUsers.model.js
+│   │   └── settings.model.js
+│   ├── routes/
+│   │   ├── auth.routes.js
+│   │   ├── pages.routes.js
+│   │   ├── news.routes.js
+│   │   ├── publications.routes.js
+│   │   ├── faq.routes.js
+│   │   ├── messages.routes.js
+│   │   ├── adminUsers.routes.js
+│   │   ├── settings.routes.js
+│   │   ├── upload.routes.js
+│   │   └── index.js
+│   ├── services/
+│   │   ├── auth.service.js
+│   │   ├── slug.service.js
+│   │   └── file.service.js
+│   ├── utils/
+│   │   ├── apiResponse.js
+│   │   ├── asyncHandler.js
+│   │   ├── date.js
+│   │   └── security.js
+│   ├── validators/
+│   │   ├── auth.validator.js
+│   │   ├── pages.validator.js
+│   │   ├── news.validator.js
+│   │   ├── publications.validator.js
+│   │   ├── faq.validator.js
+│   │   ├── message.validator.js
+│   │   └── adminUsers.validator.js
+│   ├── app.js
+│   └── server.js
+├── uploads/
+│   ├── images/
+│   └── documents/
+├── sql/
+│   ├── schema.sql
+│   └── seed.sql
+├── .env
+├── package.json
+└── nodemon.json
+
+
+uploads/
+├── images/
+│   ├── news/
+│   ├── pages/
+│   ├── settings/
+│   └── publications/
+└── documents/
+    ├── publications/
+    └── others/

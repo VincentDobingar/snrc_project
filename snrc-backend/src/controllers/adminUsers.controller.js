@@ -1,0 +1,66 @@
+import bcrypt from "bcryptjs";
+import { AdminUsersModel } from "../models/adminUsers.model.js";
+import { AuthModel } from "../models/auth.model.js";
+import { ok } from "../utils/apiResponse.js";
+
+export const AdminUsersController = {
+  async getAll(_req, res) {
+    const users = await AdminUsersModel.listAll();
+    return ok(res, "Administrateurs récupérés avec succès", { users });
+  },
+  async create(req, res, next) {
+    const existing = await AuthModel.findByEmail(req.body.email);
+    if (existing) {
+      const error = new Error("Cet email existe déjà");
+      error.status = 409;
+      return next(error);
+    }
+    const user = await AdminUsersModel.create({
+      ...req.body,
+      password_hash: await bcrypt.hash(req.body.password, 10),
+    });
+    return ok(res, "Administrateur créé avec succès", { user }, 201);
+  },
+  async update(req, res, next) {
+    const existing = await AdminUsersModel.findRawById(req.params.id);
+    if (!existing) {
+      const error = new Error("Administrateur introuvable");
+      error.status = 404;
+      return next(error);
+    }
+    if (req.body.email && req.body.email !== existing.email) {
+      const duplicate = await AuthModel.findByEmail(req.body.email);
+      if (duplicate) {
+        const error = new Error("Cet email existe déjà");
+        error.status = 409;
+        return next(error);
+      }
+    }
+    const user = await AdminUsersModel.update(req.params.id, {
+      full_name: req.body.full_name ?? existing.full_name,
+      email: req.body.email ?? existing.email,
+      role: req.body.role ?? existing.role,
+      status: req.body.status ?? existing.status,
+    });
+    return ok(res, "Administrateur mis à jour avec succès", { user });
+  },
+  async updatePassword(req, res, next) {
+    const existing = await AdminUsersModel.findRawById(req.params.id);
+    if (!existing) {
+      const error = new Error("Administrateur introuvable");
+      error.status = 404;
+      return next(error);
+    }
+    await AdminUsersModel.updatePassword(req.params.id, await bcrypt.hash(req.body.password, 10));
+    return ok(res, "Mot de passe mis à jour avec succès");
+  },
+  async remove(req, res, next) {
+    const deleted = await AdminUsersModel.remove(req.params.id);
+    if (!deleted) {
+      const error = new Error("Administrateur introuvable");
+      error.status = 404;
+      return next(error);
+    }
+    return ok(res, "Administrateur supprimé avec succès");
+  },
+};

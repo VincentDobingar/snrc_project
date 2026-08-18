@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg">
+  <title>Logo SNRC</title>
+  <desc>Version SVG du logo de la Société Nationale de Recouvrement des Créances, fond transparent.</desc>
+
+  <!-- Fond transparent -->
+  <rect x="0" y="0" width="1200" height="1200" fill="none"/>
+
+  <!-- Couleurs -->
+  <defs>
+    <style>
+      .blue { fill: #344AA5; }
+      .red { fill: #F01E27; }
+      .yellow { fill: #F1CB2E; }
+      .black { fill: #000000; }
+      .brand {
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: 900;
+      }
+      .subtitle {
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: 900;
+        fill: #000000;
+      }
+    </style>
+  </defs>
+
+  <!-- Grand sigle -->
+  <g class="brand blue" font-size="340">
+    <text x="85" y="690">S</text>
+    <text x="320" y="690">N</text>
+    <text x="640" y="690">R</text>
+    <text x="900" y="690">C</text>
+  </g>
+
+  <!-- Petit montant bleu -->
+  <rect x="472" y="400" width="38" height="118" class="blue"/>
+
+  <!-- Barre rouge -->
+  <rect x="580" y="215" width="55" height="458" class="red"/>
+
+  <!-- Colonne de pièces jaunes -->
+  <g class="yellow">
+    <ellipse cx="548" cy="315" rx="26" ry="14"/>
+    <ellipse cx="548" cy="343" rx="26" ry="14"/>
+    <ellipse cx="548" cy="371" rx="26" ry="14"/>
+    <ellipse cx="548" cy="399" rx="26" ry="14"/>
+    <ellipse cx="548" cy="427" rx="26" ry="14"/>
+    <ellipse cx="548" cy="455" rx="26" ry="14"/>
+    <ellipse cx="548" cy="483" rx="26" ry="14"/>
+    <ellipse cx="548" cy="511" rx="26" ry="14"/>
+    <ellipse cx="548" cy="539" rx="26" ry="14"/>
+    <ellipse cx="548" cy="567" rx="26" ry="14"/>
+    <ellipse cx="548" cy="595" rx="26" ry="14"/>
+  </g>
+
+  <!-- Découpe diagonale blanche pour rappeler le N -->
+  <polygon points="485,485 510,460 690,675 665,675" fill="#FFFFFF"/>
+
+  <!-- Sous-titre centré sur deux lignes -->
+  <g class="subtitle" text-anchor="middle">
+    <text x="600" y="760" font-size="44">SOCIÉTÉ NATIONALE DE RECOUVREMENT</text>
+    <text x="600" y="840" font-size="44">DES CRÉANCES</text>
+  </g>
+</svg>

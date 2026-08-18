@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+@theme {
+  --color-snrc-blue: #2446a6;
+  --color-snrc-red: #e3202a;
+  --color-snrc-gold: #d4a62a;
+  --color-snrc-light: #f5f7fb;
+  --color-snrc-dark: #1f2937;
+  --color-snrc-muted: #6b7280;
+
+  --font-sans: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: "Montserrat", "Segoe UI", Roboto, Arial, sans-serif;
+
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+:root {
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--color-snrc-dark);
+  background-color: #ffffff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #ffffff;
+  color: var(--color-snrc-dark);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Helpers SNRC */
+.container-snrc {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.section-snrc {
+  @apply py-14 sm:py-16 lg:py-20;
+}
+
+.title-snrc {
+  font-family: var(--font-display);
+  @apply text-3xl font-bold tracking-tight text-snrc-dark sm:text-4xl lg:text-5xl;
+}
+
+.subtitle-snrc {
+  @apply mt-3 max-w-3xl text-base leading-7 text-gray-600 sm:text-lg;
+}
+
+.card-snrc {
+  @apply rounded-2xl border border-gray-100 bg-white shadow-soft;
+}
+
+.btn-snrc-primary {
+  @apply inline-flex items-center justify-center rounded-xl bg-snrc-red px-5 py-3 font-semibold text-white transition hover:opacity-90;
+}
+
+.btn-snrc-secondary {
+  @apply inline-flex items-center justify-center rounded-xl bg-snrc-blue px-5 py-3 font-semibold text-white transition hover:opacity-90;
+}
+
+.btn-snrc-outline {
+  @apply inline-flex items-center justify-center rounded-xl border border-snrc-blue px-5 py-3 font-semibold text-snrc-blue transition hover:bg-snrc-blue hover:text-white;
+}
+
+.editor-toolbar {
+  @apply flex flex-wrap gap-2 rounded-2xl border border-snrc-blue/10 bg-snrc-light p-3;
+}
+
+.editor-tool-btn {
+  @apply inline-flex items-center gap-2 rounded-xl border border-snrc-blue/10 bg-white px-3 py-2 text-sm font-medium text-snrc-blue transition hover:bg-snrc-blue hover:text-white;
+}
+
+.editor-surface {
+  @apply rounded-2xl border border-snrc-blue/15 bg-white px-4 py-4 text-snrc-blue outline-none transition focus:border-snrc-blue;
+  line-height: 1.75;
+}
+
+.editor-surface:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(36, 70, 166, 0.45);
+}
+
+.rich-content {
+  color: rgba(36, 70, 166, 0.88);
+  line-height: 1.85;
+}
+
+.rich-content > * + * {
+  margin-top: 1rem;
+}
+
+.rich-content h1,
+.rich-content h2,
+.rich-content h3,
+.rich-content h4 {
+  color: #2446a6;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.rich-content h1 {
+  font-size: 2rem;
+}
+
+.rich-content h2 {
+  font-size: 1.5rem;
+}
+
+.rich-content h3 {
+  font-size: 1.25rem;
+}
+
+.rich-content p {
+  margin: 0;
+}
+
+.rich-content ul,
+.rich-content ol {
+  padding-left: 1.5rem;
+}
+
+.rich-content ul {
+  list-style: disc;
+}
+
+.rich-content ol {
+  list-style: decimal;
+}
+
+.rich-content a {
+  color: #2446a6;
+  text-decoration: underline;
+}
+
+.rich-content blockquote {
+  border-left: 4px solid #2446a6;
+  background: rgba(36, 70, 166, 0.06);
+  padding: 1rem 1rem 1rem 1.25rem;
+  border-radius: 0.75rem;
+}
+
+.rich-content pre {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 1rem;
+  border-radius: 1rem;
+  overflow-x: auto;
+}
+
+.rich-content code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}

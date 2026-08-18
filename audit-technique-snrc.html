@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audit technique SNRC</title>
+
+<style>
+  :root {
+    --paper: #eef0f5;
+    --surface: #ffffff;
+    --surface-2: #f5f6fa;
+    --ink: #161b33;
+    --ink-soft: #4d5480;
+    --ink-faint: #7d84ab;
+    --blue: #24408f;
+    --blue-deep: #10163a;
+    --line: #d9dcea;
+    --line-strong: #c1c6de;
+    --crit: #93202b; --crit-bg: #f7e1e3; --crit-line: #dcb0b6;
+    --imp: #8a611f;  --imp-bg: #f6ecd6;  --imp-line: #e0c98c;
+    --min: #295a53;  --min-bg: #dfeceb;  --min-line: #b7d8d3;
+    --ok: #2b6b45;   --ok-bg: #dcf0e1;   --ok-line: #a9d6b8;
+    --shadow: 0 1px 2px rgba(16,22,58,0.06), 0 8px 24px -12px rgba(16,22,58,0.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0b0e21; --surface: #12162f; --surface-2: #161b38;
+      --ink: #e8eaf6; --ink-soft: #aab0d6; --ink-faint: #7c82ab;
+      --blue: #8ea0e8; --blue-deep: #060814;
+      --line: #262c52; --line-strong: #33396a;
+      --crit: #f0a2aa; --crit-bg: #3a1a20; --crit-line: #5c2b33;
+      --imp: #ecc373;  --imp-bg: #3a2f14;  --imp-line: #5c4a20;
+      --min: #8fd6c9;  --min-bg: #133330;  --min-line: #235049;
+      --ok: #9fe0b4;   --ok-bg: #123321;   --ok-line: #235038;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 28px -12px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0b0e21; --surface: #12162f; --surface-2: #161b38;
+    --ink: #e8eaf6; --ink-soft: #aab0d6; --ink-faint: #7c82ab;
+    --blue: #8ea0e8; --blue-deep: #060814;
+    --line: #262c52; --line-strong: #33396a;
+    --crit: #f0a2aa; --crit-bg: #3a1a20; --crit-line: #5c2b33;
+    --imp: #ecc373;  --imp-bg: #3a2f14;  --imp-line: #5c4a20;
+    --min: #8fd6c9;  --min-bg: #133330;  --min-line: #235049;
+    --ok: #9fe0b4;   --ok-bg: #123321;   --ok-line: #235038;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 28px -12px rgba(0,0,0,0.6);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px 96px; }
+
+  .masthead {
+    background: linear-gradient(155deg, var(--blue-deep), #1a2360 70%, var(--blue-deep));
+    color: #eef0fb;
+    padding: 56px 24px 40px;
+    margin-bottom: 8px;
+  }
+  .masthead-inner { max-width: 960px; margin: 0 auto; }
+  .eyebrow {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 12.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #b9c2ef; margin: 0 0 14px;
+  }
+  h1 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    font-size: clamp(30px, 4.6vw, 44px);
+    line-height: 1.1; margin: 0 0 14px; text-wrap: balance; font-weight: 700;
+  }
+  .lede { font-size: 16px; color: #cdd4f4; max-width: 68ch; margin: 0 0 28px; }
+  .stat-row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat { min-width: 120px; }
+  .stat .num { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 26px; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; }
+  .stat.crit .num { color: #f0a2aa; }
+  .stat.imp .num { color: #ecc373; }
+  .stat.min .num { color: #a7d9d0; }
+  .stat .lbl { font-size: 12.5px; color: #aab3e2; margin-top: 2px; }
+
+  h2 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    font-size: 26px; color: var(--ink); margin: 0 0 6px; font-weight: 700;
+  }
+  h3 {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    font-size: 18px; color: var(--ink); margin: 0 0 12px; font-weight: 700;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  h3 .count {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 12px; color: var(--ink-faint); font-weight: 500;
+  }
+  .section-intro { font-size: 14.5px; color: var(--ink-soft); max-width: 68ch; margin: 0 0 24px; }
+
+  .side-section { margin-top: 52px; }
+  .side-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    border-bottom: 2px solid var(--blue); padding-bottom: 10px; margin-bottom: 22px;
+  }
+  .side-head-counts { display: flex; gap: 8px; font-size: 12px; font-family: ui-monospace, Consolas, monospace; }
+
+  .subsection { margin-bottom: 30px; }
+  .finding-list { display: flex; flex-direction: column; gap: 10px; }
+
+  details.finding {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  details.finding > summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    font-weight: 600; font-size: 14.5px;
+  }
+  details.finding > summary::-webkit-details-marker { display: none; }
+  details.finding > summary::before {
+    content: "›"; display: inline-block; transform: rotate(0deg);
+    transition: transform 0.15s ease; color: var(--ink-faint); font-size: 16px; width: 10px;
+  }
+  details.finding[open] > summary::before { transform: rotate(90deg); }
+  .sev-chip {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 3px 8px; border-radius: 100px; white-space: nowrap; flex-shrink: 0;
+  }
+  .sev-chip.sev-crit, details.sev-crit { }
+  .sev-chip.sev-crit { background: var(--crit-bg); color: var(--crit); }
+  .sev-chip.sev-imp  { background: var(--imp-bg);  color: var(--imp); }
+  .sev-chip.sev-min  { background: var(--min-bg);  color: var(--min); }
+  .sev-chip.sev-ok   { background: var(--ok-bg);   color: var(--ok); }
+  details.finding.sev-crit { border-left: 3px solid var(--crit); }
+  details.finding.sev-imp  { border-left: 3px solid var(--imp); }
+  details.finding.sev-min  { border-left: 3px solid var(--min); }
+  details.finding.sev-ok   { border-left: 3px solid var(--ok); }
+  .finding-body { padding: 0 16px 16px 40px; }
+  .finding-ref {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+    font-size: 12px; color: var(--blue); margin-bottom: 8px; word-break: break-word;
+  }
+  .finding-desc { font-size: 14px; color: var(--ink); margin: 0 0 10px; }
+  .finding-reco { font-size: 13.5px; color: var(--ink-soft); margin: 0; border-top: 1px solid var(--line); padding-top: 10px; }
+  .reco-label { color: var(--ink); font-weight: 600; }
+
+  .roadmap {
+    margin-top: 40px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 26px 26px 24px;
+  }
+  .roadmap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 16px; }
+  .roadmap-col h4 {
+    font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em;
+    margin: 0 0 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .roadmap-col.crit h4 { color: var(--crit); }
+  .roadmap-col.imp h4 { color: var(--imp); }
+  .roadmap-col ul { margin: 0; padding-left: 18px; font-size: 13.5px; color: var(--ink); }
+  .roadmap-col li { margin-bottom: 8px; }
+  .rm-side {
+    font-family: ui-monospace, Consolas, monospace; font-size: 10.5px;
+    color: var(--ink-faint); text-transform: uppercase; margin-right: 4px;
+  }
+
+  .positives {
+    margin-top: 20px;
+    background: var(--ok-bg);
+    border: 1px solid var(--ok-line);
+    border-radius: 10px;
+    padding: 20px 22px;
+  }
+  .positives h3 { color: var(--ok); margin-bottom: 10px; }
+  .positives ul { margin: 0; padding-left: 18px; font-size: 13.5px; color: var(--ink); }
+  .positives li { margin-bottom: 6px; }
+
+  .methodo {
+    margin-top: 48px;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+
+  @media (max-width: 680px) {
+    .roadmap-grid { grid-template-columns: 1fr; }
+    .masthead { padding: 40px 20px 32px; }
+    .finding-body { padding-left: 16px; }
+  }
+</style>
+
+</head>
+<body>
+<div class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow">SNRC · Tchad — Audit technique du site institutionnel</p>
+    <h1>Ce que révèle vraiment le code, derrière le site qui fonctionne</h1>
+    <p class="lede">Lecture intégrale du backend (Express/PostgreSQL) et du frontend (React/Vite) — pas d’exécution de code, pas de scan automatisé : chaque constat ci-dessous est vérifié fichier par fichier, avec sa référence précise.</p>
+    <div class="stat-row">
+      <div class="stat crit"><div class="num">4</div><div class="lbl">critiques</div></div>
+      <div class="stat imp"><div class="num">25</div><div class="lbl">importants</div></div>
+      <div class="stat min"><div class="num">23</div><div class="lbl">mineurs</div></div>
+      <div class="stat"><div class="num">0</div><div class="lbl">injection SQL détectée</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="roadmap">
+    <h2>Par où commencer</h2>
+    <p class="section-intro">4 points critiques exposent aujourd’hui le site à une prise de contrôle de compte admin ou à un XSS visible par tous les visiteurs. Le reste peut suivre un rythme normal de sprint.</p>
+    <div class="roadmap-grid">
+      <div class="roadmap-col crit">
+        <h4>Cette semaine — Critique</h4>
+        <ul><li><span class="rm-side">Backend</span> CSRF exploitable sur toutes les routes admin en POST</li><li><span class="rm-side">Backend</span> Aucun rate-limiting ni verrouillage sur la connexion admin</li><li><span class="rm-side">Backend</span> /auth/refresh ne revérifie pas si le compte est toujours actif</li><li><span class="rm-side">Frontend</span> XSS stocké potentiel via contenu riche non assaini</li></ul>
+      </div>
+      <div class="roadmap-col imp">
+        <h4>Ce mois-ci — Important (extrait)</h4>
+        <ul><li><span class="rm-side">Backend</span> Routage CRUD dupliqué : FAQ et Settings contournent silencieusement la validation</li><li><span class="rm-side">Backend</span> Upload d’image accepte image/svg+xml → XSS stocké possible</li><li><span class="rm-side">Backend</span> Validation de fichier basée uniquement sur le mimetype déclaré par le client</li><li><span class="rm-side">Backend</span> Aucune sanitisation HTML des champs riches stockés en base</li><li><span class="rm-side">Backend</span> Politique de mot de passe faible pour les comptes admin</li><li><span class="rm-side">Backend</span> Pas de révocation de session / JWT versionné, PII dans le payload</li><li><span class="rm-side">Backend</span> Secrets .env à faible entropie, non bloqués par le garde-fou existant</li><li><span class="rm-side">Backend</span> pg.Pool sans gestionnaire d’erreur → risque de crash du process</li><li><em>+ 17 autres — détail dans les sections ci-dessous</em></li></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="positives">
+    <h3>Ce qui est déjà solide</h3>
+    <ul><li>Toutes les requêtes SQL du backend sont paramétrées ($1, $2...) — aucune injection SQL détectée sur l’ensemble du code, y compris dans les contrôleurs "admin*" en SQL brut.</li><li>Le token de session n’est jamais stocké en localStorage/sessionStorage côté frontend — authentification par cookie httpOnly, le bon pattern contre le vol de session via XSS.</li><li>Le module Recrutement (offres + candidatures + back-office) annoncé comme nouveauté est complet et fonctionnel de bout en bout, sans écart entre promesse et code.</li><li>L’accordéon FAQ public gère correctement aria-expanded/aria-controls.</li></ul>
+  </div>
+
+  <section class="side-section" id="backend">
+    <div class="side-head">
+      <h2>Backend — API &amp; base de données</h2>
+      <div class="side-head-counts">
+        <span class="sev-chip sev-crit">3</span>
+        <span class="sev-chip sev-imp">15</span>
+        <span class="sev-chip sev-min">12</span>
+      </div>
+    </div>
+    
+    <div class="subsection">
+      <h3>Sécurité <span class="count">14</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-crit" open>
+    <summary>
+      <span class="sev-chip sev-crit">Critique</span>
+      <span class="finding-title">CSRF exploitable sur toutes les routes admin en POST</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/utils/cookies.js:6-11, src/app.js:39</div>
+      <p class="finding-desc">Le cookie JWT est envoyé avec `sameSite:"none"` en production et aucun jeton CSRF (double-submit ou header dédié) n’est vérifié côté serveur. `express.urlencoded()` est actif globalement. Un formulaire hébergé sur un site tiers peut donc déclencher une requête POST authentifiée (création de compte superadmin, modification de contenu) à l’insu de l’admin connecté qui visite la page piégée.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter un jeton CSRF (double-submit cookie ou header X-CSRF-Token vérifié serveur), ou n’accepter l’auth par cookie que pour les GET et exiger un Authorization: Bearer pour toute mutation.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-crit" open>
+    <summary>
+      <span class="sev-chip sev-crit">Critique</span>
+      <span class="finding-title">Aucun rate-limiting ni verrouillage sur la connexion admin</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/routes/auth.routes.js:9, src/controllers/auth.controller.js:17-51</div>
+      <p class="finding-desc">Rien n’empêche un brute-force sur /auth/login : pas de express-rate-limit ni équivalent dans les dépendances. Combiné à la politique de mot de passe faible (6 caractères minimum), un compte admin est cassable en temps raisonnable.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter express-rate-limit par IP+email sur /auth/login, avec verrouillage progressif après N échecs.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-crit" open>
+    <summary>
+      <span class="sev-chip sev-crit">Critique</span>
+      <span class="finding-title">/auth/refresh ne revérifie pas si le compte est toujours actif</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/controllers/auth.controller.js:63-73</div>
+      <p class="finding-desc">`refresh` récupère l’utilisateur mais ne teste jamais `status !== "active"`, contrairement à `login` qui le fait. Un admin désactivé par un superadmin peut continuer à renouveler sa session indéfiniment via un token déjà émis : la désactivation n’a alors aucun effet réel.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter la vérification status==="active" dans refresh, et idéalement un token_version en base pour révoquer immédiatement les JWT existants.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Routage CRUD dupliqué : FAQ et Settings contournent silencieusement la validation</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/routes/index.js:29-37</div>
+      <p class="finding-desc">adminFaqsRoutes (SQL brut, aucune validation) est monté avant faqRoutes (avec faqValidator) ; adminSettingsRoutes avant settingsRoutes. Express exécute le premier routeur qui matche : en production, POST/PUT /admin/faqs et PUT /admin/settings passent par le contrôleur non validé. faqValidator ne protège donc jamais réellement ces routes malgré son branchement apparent.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Supprimer les implémentations doublons, garder une seule version validée par domaine, et faire échouer le démarrage si deux routeurs déclarent le même chemin.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Upload d’image accepte image/svg+xml → XSS stocké possible</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/middlewares/upload.js:32-39,41-47</div>
+      <p class="finding-desc">imageUpload whitelist tout Content-Type commençant par "image/", y compris les SVG. Le fichier est servi statiquement ensuite. Un SVG contenant &lt;script&gt; uploadé via /admin/uploads/image (accessible à un admin_editeur) peut exécuter du JS s’il est ouvert directement dans un navigateur.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Exclure image/svg+xml de la whitelist, ou forcer Content-Disposition: attachment / re-render serveur pour les SVG.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Validation de fichier basée uniquement sur le mimetype déclaré par le client</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/middlewares/upload.js:32-39,49-66</div>
+      <p class="finding-desc">file.mimetype vient de l’en-tête multipart fourni par le client, trivialement falsifiable. Aucune vérification des magic bytes n’est faite, ni pour les images ni pour les CV/documents.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Valider le contenu réel du fichier (signature binaire, ex. lib file-type) en plus du mimetype déclaré.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Aucune sanitisation HTML des champs riches stockés en base</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/controllers/pages.controller.js:21-28, news.controller.js:25-34, services.controller.js:16-21, jobs.controller.js:25-33</div>
+      <p class="finding-desc">Aucune lib de sanitisation (sanitize-html, DOMPurify+jsdom...) n’est présente. Le contenu HTML riche (pages, actualités, publications, services, offres d’emploi) est stocké brut. Un compte admin_editeur compromis ou malveillant peut injecter du JS persistant visible par tous les visiteurs publics.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Sanitiser content/summary/description côté serveur avant écriture (whitelist de balises), ne pas se reposer uniquement sur le front.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Politique de mot de passe faible pour les comptes admin</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/validators/adminUsers.validator.js:6,19</div>
+      <p class="finding-desc">isLength({min:6}) sans aucune exigence de complexité, pour des comptes à privilèges élevés (un superadmin peut créer/supprimer d’autres admins). Combiné à l’absence de rate-limiting, c’est un vecteur de compromission réaliste.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Exiger 10-12 caractères minimum + vérification contre une liste de mots de passe communs (ex. zxcvbn).</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Pas de révocation de session / JWT versionné, PII dans le payload</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/controllers/auth.controller.js:8-14</div>
+      <p class="finding-desc">Le JWT embarque email, full_name, role, sans jti ni token_version en base. Un changement de rôle ou une désactivation reste sans effet tant que le token n’a pas expiré naturellement (JWT_EXPIRES_IN=1d par défaut).</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter une colonne token_version sur admins, l’inclure dans le JWT et la vérifier dans requireAuth.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Secrets .env à faible entropie, non bloqués par le garde-fou existant</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/config/env.js:10-19, .env:11,13</div>
+      <p class="finding-desc">JWT_SECRET et DB_PASSWORD ne sont pas les placeholders connus de .env.example (donc non bloqués par requireSecret) mais suivent un motif prévisible plutôt qu’un secret aléatoire de haute entropie. La protection actuelle ne couvre qu’une liste noire de 3 valeurs connues.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Générer JWT_SECRET avec crypto.randomBytes(64).toString("hex") et exiger une longueur minimale (refuser tout secret &lt;32 caractères) plutôt qu’une simple liste noire.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Variables d’environnement mortes créant une fausse impression de sécurité</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">.env:5,17, src/app.js:40</div>
+      <p class="finding-desc">COOKIE_SECRET et API_URL sont définies mais jamais lues dans le code (cookieParser() est appelé sans secret). Donne l’impression que les cookies sont signés alors qu’ils ne le sont pas (le JWT lui-même est signé, donc pas critique).</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Nettoyer .env/.env.example ou câbler réellement cookieParser(secret).</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Aucune limite de fréquence sur les formulaires publics contact et candidature</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/routes/messages.routes.js:9, src/routes/jobs.routes.js:22-28</div>
+      <p class="finding-desc">Pas de CAPTCHA ni de rate-limit : spam du formulaire de contact et flood de candidatures (avec upload de fichiers) possibles, avec accumulation de fichiers disque sans nettoyage.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Rate-limit par IP + honeypot/CAPTCHA sur ces deux formulaires publics.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Un superadmin peut se désactiver/supprimer lui-même sans garde-fou</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/controllers/adminUsers.controller.js:24-46,57-65</div>
+      <p class="finding-desc">update/remove n’excluent pas l’auto-modification ni ne vérifient qu’il reste au moins un superadmin actif après l’opération.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Bloquer la suppression/désactivation du dernier superadmin actif.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">crossOriginResourcePolicy désactivé globalement au lieu d’être ciblé</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/app.js:22-26</div>
+      <p class="finding-desc">La désactivation vise probablement à permettre le chargement cross-origin des fichiers /uploads, mais s’applique à toute l’API, y compris les réponses JSON qui perdent aussi cette protection.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Restreindre crossOriginResourcePolicy:false au seul routeur /uploads via une config helmet dédiée.</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Architecture <span class="count">8</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">pg.Pool sans gestionnaire d’erreur → risque de crash du process</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/config/db.js:6-12</div>
+      <p class="finding-desc">Aucun pool.on("error", ...). Une erreur sur un client idle (coupure réseau, redémarrage DB) émet un événement "error" non intercepté qui peut faire planter tout le process Node selon la doc pg.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter pool.on("error", (err) =&gt; console.error("Pool error", err)).</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Race condition sur settings (lecture-puis-écriture sans transaction)</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/controllers/adminSettings.controller.js:42-171</div>
+      <p class="finding-desc">Un SELECT décide s’il faut INSERT ou UPDATE, sans BEGIN/COMMIT ni verrou, et aucune contrainte unique n’empêche la duplication. Deux PUT /admin/settings concurrents peuvent chacun voir "aucune ligne" et créer deux lignes de configuration.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Contrainte UNIQUE (singleton id=1) ou INSERT ... ON CONFLICT DO UPDATE dans une transaction.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">morgan déclaré en dépendance mais jamais monté : logging HTTP absent</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">package.json:22, src/app.js</div>
+      <p class="finding-desc">Le seul logging est du console.log/error/warn ad hoc dispersé dans le code. Aucune trace structurée des requêtes HTTP en production.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Monter morgan("combined") (ou un logger structuré type pino/winston) avant les routes.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Deux systèmes d’erreur/404 concurrents et incohérents</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/middlewares/errorHandler.js, notFound.js vs src/app.js:64-82</div>
+      <p class="finding-desc">errorHandler.js et notFound.js existent comme fichiers dédiés mais ne sont importés nulle part : app.js réimplémente sa propre version inline, avec un format de message différent (champ errors absent dans la version active).</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Supprimer les fichiers morts ou les brancher réellement, unifier le format de réponse d’erreur.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">app.js lit process.env.NODE_ENV directement au lieu du module env centralisé</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/app.js:78</div>
+      <p class="finding-desc">Contourne src/config/env.js pourtant utilisé ailleurs (cors.js), créant une incohérence si cette valeur est normalisée un jour dans env.js.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Importer et utiliser env.NODE_ENV partout.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Pas de pagination ni de plafond sur les listes (pages, news, publications, faqs, messages, jobs...)</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/models/news.model.js:4-11</div>
+      <p class="finding-desc">Number(req.query.limit || 20) sans plafond ni isInt : un appelant peut demander un limit arbitrairement grand, ou une valeur NaN provoquant une 500 au lieu d’une 400 propre.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter pagination LIMIT/OFFSET avec bornes, valider limit via express-validator.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Aucun index explicite sur les colonnes de jointure/filtrage fréquentes</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">sql/schema.sql</div>
+      <p class="finding-desc">Pas de CREATE INDEX sur job_applications.job_offer_id (FK), news.status/published_at, publications.category_id, messages.is_read/status. Postgres n’indexe pas automatiquement les clés étrangères.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter des index sur ces colonnes, en priorité les FK.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Pas d’outil de migration versionné</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">sql/schema.sql, sql/migration_recrutement.sql, sql/sql.sql</div>
+      <p class="finding-desc">Trois fichiers SQL manuels coexistent, appliqués à la main. Pas de suivi de version de schéma, pas de rollback possible.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Adopter un outil de migration (node-pg-migrate, Knex, Prisma...) dès que le schéma évoluera davantage.</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Fonctionnel <span class="count">4</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">adminPages/adminNews/adminPublications : ~500 lignes de code mort inatteignable</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/routes/index.js:23 vs 29, :25 vs 30, :26 vs 31</div>
+      <p class="finding-desc">pagesRoutes est monté avant adminPagesRoutes sur les mêmes chemins GET/POST/PUT/DELETE /admin/pages(/:id) ; Express traite le premier match. Même situation pour news et publications : les contrôleurs "admin*" correspondants ne s’exécutent jamais.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Supprimer ces trois paires de fichiers morts, ou clarifier lequel doit être le module officiel.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">À l’inverse, faq.controller.js et settings.controller.js (versions validées) sont eux-mêmes shadowés</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/routes/index.js:32 vs 35, :33 vs 37</div>
+      <p class="finding-desc">adminFaqsRoutes est monté avant faqRoutes, et adminSettingsRoutes avant settingsRoutes : conséquence directe du même problème de routage, cf. finding sécurité correspondant.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Choisir une seule implémentation par domaine (celle avec validateRequest) et supprimer l’autre.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">GET /publication-categories doublement défini</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/routes/index.js:26 vs 27</div>
+      <p class="finding-desc">publications.routes.js expose déjà getCategories avant que publicationCategories.routes.js soit monté ; ce second contrôleur ne s’exécute jamais (résultat équivalent donc sans impact fonctionnel visible).</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Supprimer publicationCategories.controller.js/.routes.js ou fusionner proprement.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Module Services sans endpoint public par slug</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/routes/services.routes.js:9</div>
+      <p class="finding-desc">Contrairement à Pages/News/Publications/Jobs, Services n’expose qu’une liste complète, pas de GET /services/:slug. Incohérence de surface d’API entre modules similaires.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter GET /services/:slug si le front en a besoin, ou documenter l’écart volontaire.</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Dette technique <span class="count">4</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Zéro test automatisé dans tout le projet</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">package.json:7-11</div>
+      <p class="finding-desc">Aucun script test, aucune dépendance de test (jest, vitest, supertest...), aucun fichier *.test.js.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter au minimum des tests d’intégration sur auth, requireRole, et les endpoints CRUD les plus sensibles (admin/users).</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Triplication de buildSlug() et duplication de mapUniqueError()</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/controllers/adminPages.controller.js:3-22, adminNews.controller.js:3-22, adminPublications.controller.js:3-11</div>
+      <p class="finding-desc">Code identique copié-collé à 3 endroits (fichiers actuellement morts, cf. finding fonctionnel correspondant), qui devra être maintenu à 3 endroits si quelqu’un les réactive un jour sans le savoir.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Supprimer ces fichiers, ou extraire un util partagé slug.service.js si conservés.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Messages d’erreur mélangeant français et anglais</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/middlewares/requireAuth.js:11,20, requireRole.js:5,9</div>
+      <p class="finding-desc">"Authentication required", "Invalid or expired token", "Access denied" en anglais alors que la quasi-totalité des messages métier sont en français.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Uniformiser en français, cohérent avec le reste de l’application institutionnelle.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Script SQL d’infrastructure avec identifiants d’hébergement en dur, commité dans le repo</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">sql/sql.sql:1-16</div>
+      <p class="finding-desc">Script de GRANT ad hoc avec des noms d’utilisateurs d’hébergement en dur. Pas un secret, mais une fuite d’information sur l’infrastructure et un fichier hors de propos dans le dossier sql/ applicatif.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Retirer du repo ou déplacer vers une documentation d’infra non versionnée avec le code.</p>
+    </div>
+  </details></div>
+    </div>
+  </section>
+
+  <section class="side-section" id="frontend">
+    <div class="side-head">
+      <h2>Frontend — React &amp; expérience publique</h2>
+      <div class="side-head-counts">
+        <span class="sev-chip sev-crit">1</span>
+        <span class="sev-chip sev-imp">10</span>
+        <span class="sev-chip sev-min">11</span>
+      </div>
+    </div>
+    
+    <div class="subsection">
+      <h3>Sécurité <span class="count">4</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-crit" open>
+    <summary>
+      <span class="sev-chip sev-crit">Critique</span>
+      <span class="finding-title">XSS stocké potentiel via contenu riche non assaini</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/components/ui/RichContent.jsx:8-14</div>
+      <p class="finding-desc">dangerouslySetInnerHTML affiche le contenu des pages, actualités, offres d’emploi et FAQ sans aucune sanitization (pas de DOMPurify). Ce HTML est produit par un éditeur riche basé sur document.execCommand qui stocke l’innerHTML brut du navigateur. Un compte admin compromis ou une faille côté API suffit à exécuter du JS pour tous les visiteurs publics.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Sanitiser côté client (DOMPurify) ET côté serveur avant stockage, avec une whitelist stricte de balises/attributs.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Pas de séparation de rôles au niveau du routing frontend</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/app/router.jsx:63-84</div>
+      <p class="finding-desc">ProtectedRoute protège globalement toute la section /admin avec les mêmes rôles, y compris /admin/administrateurs (création de comptes, y compris superadmin) et /admin/parametres. Un admin_editeur a dans l’UI le même accès visuel qu’un superadmin pour gérer comptes et paramètres.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Filtrer les routes/sections sensibles par rôle exact côté frontend (défense en profondeur), en plus du contrôle serveur.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Fuite d’informations de debug en console, même en production</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/api/axios.js:20-26, src/pages/admin/Dashboard.jsx:65</div>
+      <p class="finding-desc">Chaque erreur API loggue message, status, data, url, baseURL en console.error, y compris en build de production, exposant la structure de l’API à tout visiteur ouvrant les DevTools.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Désactiver ces logs en production, ou les envoyer à un service de monitoring plutôt qu’à la console.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Aucune contrainte de robustesse sur le mot de passe à la création d’un admin</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/admin/AdminUsersManager.jsx:247-254</div>
+      <p class="finding-desc">Le champ mot de passe initial n’a ni minLength, ni pattern, ni retour de force ; zod est disponible en dépendance mais n’est pas utilisé ici.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter un schéma zod partagé pour les mots de passe admin avec retour immédiat.</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>SEO <span class="count">5</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">html lang="en" alors que tout le contenu est en français</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">index.html:2</div>
+      <p class="finding-desc">Impacte le référencement (Google associe la langue déclarée au contenu réel) et l’accessibilité (mauvaise synthèse vocale pour les lecteurs d’écran).</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Corriger en &lt;html lang="fr"&gt;.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Pas d’image Open Graph par défaut : partages LinkedIn/Facebook sans visuel</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/hooks/usePageMeta.jsx:11-20</div>
+      <p class="finding-desc">og:image n’est ajouté que si explicitement passé — seule la page NewsDetail le fait. Home, About, Missions, Services, Publications, FAQ, Contact, Jobs partagent donc sans visuel sur les réseaux sociaux. og:url, og:site_name, og:locale et twitter:card manquent aussi, tout comme un &lt;link rel="canonical"&gt;.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter une image OG par défaut (logo/armoirie institutionnelle) et compléter og:url/og:site_name/twitter:card dans usePageMeta.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">sitemap.xml incomplet : la page Carrières est absente</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">public/sitemap.xml:1-43</div>
+      <p class="finding-desc">Le sitemap ne référence que 7 URLs statiques. /carrieres — le module recrutement, présenté comme la nouveauté phare — est totalement absent, de même que les URLs dynamiques (actualités, offres).</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter /carrieres immédiatement, et générer dynamiquement les URLs des actualités/offres publiées.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Double h1 sur les pages de détail actualité et offre d’emploi</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/NewsDetail.jsx:111, JobDetail.jsx:169</div>
+      <p class="finding-desc">PageBanner rend déjà un h1, et ces deux pages en rendent un second dans le corps : deux titres de niveau 1 identiques sur la même page.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Passer le second titre en h2.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Page 404 sans métadonnées ni noindex</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/NotFound.jsx</div>
+      <p class="finding-desc">Aucun appel à usePageMeta : le title reste celui du site par défaut et rien n’empêche l’indexation d’une page d’erreur.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter usePageMeta({ title: "Page introuvable" }) avec meta name="robots" content="noindex".</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Accessibilité <span class="count">4</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Menu mobile sans état ARIA ni gestion clavier</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/components/layout/Header.jsx:127-134,138-210</div>
+      <p class="finding-desc">Le bouton hamburger a un aria-label correct mais pas de aria-expanded/aria-controls liant le bouton au panneau ouvert. Aucune fermeture au clavier (Échap) ni piège de focus quand le menu est ouvert.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter aria-expanded={open} + aria-controls="mobile-menu", gérer Escape et le focus au premier lien à l’ouverture.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Aucun linting d’accessibilité dans la CI</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">eslint.config.js:10-28</div>
+      <p class="finding-desc">La config n’active que js recommended, react-hooks et react-refresh — pas de eslint-plugin-jsx-a11y, donc aucune détection automatique des régressions d’accessibilité au commit.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter eslint-plugin-jsx-a11y au flat config.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Éditeur riche basé sur une API dépréciée, sans état ARIA sur les boutons toggle</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/components/admin/RichEditorField.jsx:46-50,139-166</div>
+      <p class="finding-desc">document.execCommand est déprécié (support navigateur non garanti à terme) et les boutons de la barre d’outils n’exposent pas aria-pressed pour signaler leur état actif.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Prévoir une migration vers une lib d’édition maintenue (TipTap, Lexical) à moyen terme ; en attendant, ajouter aria-pressed.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-ok">
+    <summary>
+      <span class="sev-chip sev-ok">Point positif</span>
+      <span class="finding-title">L’accordéon FAQ public est correctement accessible</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/FAQ.jsx:303-321</div>
+      <p class="finding-desc">Utilise correctement aria-expanded/aria-controls — bon exemple à répliquer sur le menu mobile.</p>
+      
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Performance <span class="count">4</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Deux des trois images du carrousel hero sont introuvables (404 silencieux)</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/Home.jsx:107,114</div>
+      <p class="finding-desc">heroSlides référence /images/sections/snrc-building.jpg et administration-publique.jpg, absents de public/images/sections/ et de dist/. Sur la page la plus visible du site, 2 slides sur 3 s’affichent sans photo.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter les fichiers manquants ou corriger les chemins vers les images existantes.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Images de bannière lourdes et non optimisées, réutilisées sur presque toutes les pages</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">public/images/sections/snrc.png (~600 Ko), snrc1.png (~605 Ko), snrc3.png (~542 Ko)</div>
+      <p class="finding-desc">Ces PNG servent de fond par défaut à PageBanner sur About, Missions, Services, Publications, NewsList, Jobs, Contact, FAQ, ainsi qu’au hero de Home. Aucun format moderne (WebP/AVIF), aucune variante responsive : poids qui pèse directement sur le LCP de chaque page.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Convertir en WebP/AVIF compressés, générer des variantes par taille d’écran (srcset), viser &lt;150 Ko par image de fond.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Appel API /settings dupliqué à chaque navigation publique</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/components/layout/Header.jsx:37, Footer.jsx:70</div>
+      <p class="finding-desc">Header et Footer appellent chacun indépendamment getSettings() dans leur propre useEffect, sans cache ni contexte partagé : deux requêtes identiques à chaque montage de PublicLayout.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Lever getSettings() au niveau de PublicLayout/un SettingsContext et injecter la donnée par contexte plutôt que par deux fetchs séparés.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Vérification de session inutile sur chaque page publique</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/main.jsx:8-15, src/contexts/AuthContext.jsx:11-24</div>
+      <p class="finding-desc">AuthProvider englobe toute l’application, public et admin. Son useEffect appelle getMe() au montage : chaque chargement de page publique déclenche un GET /auth/me alors que cette vérification ne sert qu’aux pages /admin/*.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ne monter AuthProvider/vérifier la session que dans la branche /admin du routeur, ou différer l’appel hors de ce path.</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Qualité de code <span class="count">5</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">react-hook-form + zod déclarés en dépendances mais jamais utilisés</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">package.json:13,22,24</div>
+      <p class="finding-desc">Recherche exhaustive sans résultat sur react-hook-form|zod|useForm dans src/. Tous les formulaires (Contact, candidature, Login, formulaires admin) sont gérés en useState brut, sans schéma de validation partagé ni messages d’erreur par champ.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Adopter réellement react-hook-form+zod pour au moins les formulaires publics (Contact, candidature), ou retirer ces dépendances mortes du package.json.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Formulaire de contact sans aucune validation côté client</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/Contact.jsx:282-345</div>
+      <p class="finding-desc">Aucun champ n’a d’attribut required, y compris l’email. À comparer avec JobDetail.jsx qui impose required en natif sur nom/email : incohérence de stratégie de validation entre les deux formulaires publics du site.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Harmoniser via un schéma zod commun réutilisé sur les deux formulaires.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-imp">
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">La FAQ codée en dur peut masquer silencieusement les modifications de l’admin</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/FAQ.jsx:241-251</div>
+      <p class="finding-desc">14 questions codées en dur sont placées AVANT les questions venant du CMS, puis dédoublonnées par libellé normalisé en gardant la première occurrence. Si un admin crée/modifie via FAQManager une question dont le libellé coïncide avec une des 14 questions statiques, sa version est silencieusement écartée sans aucun message d’erreur.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Inverser l’ordre ([...faqs, ...officialFaqs]) pour que le contenu CMS prime, ou migrer entièrement les 14 questions officielles en base.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Fichiers de scaffolding Vite morts dans le dépôt</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/App.css</div>
+      <p class="finding-desc">Jamais importé, contient encore le CSS du template par défaut de Vite/React.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Supprimer src/App.css et vérifier les autres assets non référencés (react.svg, vite.svg, hero.png).</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Pas de gestion centralisée des sessions admin expirées</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/api/axios.js:17-30</div>
+      <p class="finding-desc">L’intercepteur de réponse loggue et re-rejette l’erreur, sans redirection automatique vers /admin/login sur un 401 pendant une session en cours. Chaque page admin doit gérer l’erreur individuellement.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter un intercepteur global qui, sur 401, réinitialise l’état d’auth et redirige vers /admin/login.</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Fonctionnel <span class="count">2</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-ok">
+    <summary>
+      <span class="sev-chip sev-ok">Point positif</span>
+      <span class="finding-title">Le module Recrutement annoncé est réellement et intégralement implémenté</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/Jobs.jsx, JobDetail.jsx, src/pages/admin/JobsManager.jsx, JobApplicationsManager.jsx</div>
+      <p class="finding-desc">Liste des offres, fiche offre avec candidature CV/lettre/niveau d’étude, back-office complet (CRUD offres, suivi des candidatures nouveau/lu/traité, réponse email) : tout correspond fidèlement à la description de presentation-snrc.html. Aucun écart fonctionnel constaté sur ce module.</p>
+      
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Pas de page de détail pour les Publications</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/Publications.jsx</div>
+      <p class="finding-desc">Contrairement à Actualités et Carrières, les Publications n’ont pas de route /publications/:slug : chaque document n’est accessible que via un lien direct vers son fichier. Probablement voulu (ce sont des PDF), mais empêche tout partage propre avec métadonnées OG.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Évaluer si une fiche publication apporterait de la valeur SEO/partage, sinon documenter ce choix comme intentionnel.</p>
+    </div>
+  </details></div>
+    </div>
+  </section>
+
+  <p class="methodo">Méthodologie : lecture manuelle complète du code source (contrôleurs, modèles, routes, validators, composants, pages, configuration) par deux passes indépendantes (backend / frontend), le 17 août 2026. Chaque constat cite un fichier et une ligne précis. Le classement de sévérité reflète l’impact potentiel sur la sécurité, la fiabilité ou l’expérience utilisateur, pas une mesure automatisée.</p>
+</div>
+
+</body>
+</html>

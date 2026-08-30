@@ -5,7 +5,7 @@ export default function PageBanner({
   subtitle,
   badge = "SNRC",
   light = false,
-  backgroundImage = "/images/sections/snrc.png",
+  backgroundImage = "/images/sections/snrc.jpg",
 }) {
   return (
     <section

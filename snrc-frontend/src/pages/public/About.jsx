@@ -206,7 +206,7 @@ export default function About() {
         subtitle={summary}
         badge="Présentation"
         light
-        backgroundImage="/images/sections/snrc.png"
+        backgroundImage="/images/sections/snrc.jpg"
       />
 
       {/* PRÉSENTATION */}
@@ -232,7 +232,7 @@ export default function About() {
 
           <div className="card-snrc overflow-hidden rounded-[1.75rem]">
             <img
-              src={page?.banner_image || "/images/sections/snrc.png"}
+              src={page?.banner_image || "/images/sections/snrc.jpg"}
               alt={title}
               className="h-96 w-full object-cover transition-transform duration-700 hover:scale-105"
             />

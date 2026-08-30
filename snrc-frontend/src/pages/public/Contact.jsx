@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Clock3,
   Mail,
@@ -15,6 +18,24 @@ import { getPageBySlug } from "../../api/pagesApi";
 import { getSettings } from "../../api/settingsApi";
 import { sendContactMessage } from "../../api/contactApi";
 import usePageMeta from "../../hooks/usePageMeta";
+
+const contactSchema = z.object({
+  full_name: z
+    .string()
+    .trim()
+    .min(1, "Le nom complet est requis."),
+  email: z
+    .string()
+    .trim()
+    .min(1, "L’adresse email est requise.")
+    .email("Veuillez saisir une adresse email valide."),
+  phone: z.string().trim().optional(),
+  subject: z.string().trim().optional(),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Le message doit contenir au moins 10 caractères."),
+});
 
 const socialFields = [
   { key: "facebook_url", label: "Facebook" },
@@ -46,16 +67,24 @@ export default function Contact() {
   const [settings, setSettings] = useState(null);
   const [loadingPage, setLoadingPage] = useState(true);
 
-  const [form, setForm] = useState({
-    full_name: "",
-    email: "",
-    phone: "",
-    subject: "",
-    message: "",
-  });
-
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      full_name: "",
+      email: "",
+      phone: "",
+      subject: "",
+      message: "",
+    },
+  });
 
   useEffect(() => {
     getPageBySlug("contact")
@@ -70,26 +99,14 @@ export default function Contact() {
       .catch(() => setSettings(null));
   }, []);
 
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function onSubmit(values) {
     setLoading(true);
     setFeedback("");
 
     try {
-      const result = await sendContactMessage(form);
+      const result = await sendContactMessage(values);
       setFeedback(result?.message || "Message envoyé avec succès.");
-      setForm({
-        full_name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
-      });
+      reset();
     } catch (error) {
       setFeedback(
         error?.response?.data?.message ||
@@ -120,7 +137,7 @@ export default function Contact() {
         subtitle={summary}
         badge="Contact"
         light
-        backgroundImage="/images/sections/snrc.png"
+        backgroundImage="/images/sections/snrc.jpg"
       />
 
       <section className="section-snrc bg-white">
@@ -139,7 +156,7 @@ export default function Contact() {
 
           <div className="card-snrc overflow-hidden rounded-[1.75rem]">
             <img
-              src={page?.banner_image || "/images/sections/snrc.png"}
+              src={page?.banner_image || "/images/sections/snrc.jpg"}
               alt={title}
               className="h-96 w-full object-cover transition-transform duration-700 hover:scale-105"
             />
@@ -274,19 +291,22 @@ export default function Contact() {
               ou de communication institutionnelle.
             </p>
 
-            <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+            <form className="mt-6 space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
               <div>
                 <label className="mb-2 block font-medium text-snrc-blue">
                   Nom complet
                 </label>
                 <input
                   type="text"
-                  name="full_name"
-                  value={form.full_name}
-                  onChange={handleChange}
+                  {...register("full_name")}
                   className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
                   placeholder="Votre nom"
                 />
+                {errors.full_name ? (
+                  <p className="mt-2 text-sm text-snrc-red">
+                    {errors.full_name.message}
+                  </p>
+                ) : null}
               </div>
 
               <div>
@@ -295,12 +315,15 @@ export default function Contact() {
                 </label>
                 <input
                   type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
+                  {...register("email")}
                   className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
                   placeholder="Votre adresse email"
                 />
+                {errors.email ? (
+                  <p className="mt-2 text-sm text-snrc-red">
+                    {errors.email.message}
+                  </p>
+                ) : null}
               </div>
 
               <div>
@@ -309,12 +332,15 @@ export default function Contact() {
                 </label>
                 <input
                   type="text"
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
+                  {...register("phone")}
                   className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
                   placeholder="Votre numéro"
                 />
+                {errors.phone ? (
+                  <p className="mt-2 text-sm text-snrc-red">
+                    {errors.phone.message}
+                  </p>
+                ) : null}
               </div>
 
               <div>
@@ -323,12 +349,15 @@ export default function Contact() {
                 </label>
                 <input
                   type="text"
-                  name="subject"
-                  value={form.subject}
-                  onChange={handleChange}
+                  {...register("subject")}
                   className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
                   placeholder="Objet du message"
                 />
+                {errors.subject ? (
+                  <p className="mt-2 text-sm text-snrc-red">
+                    {errors.subject.message}
+                  </p>
+                ) : null}
               </div>
 
               <div>
@@ -337,12 +366,15 @@ export default function Contact() {
                 </label>
                 <textarea
                   rows="5"
-                  name="message"
-                  value={form.message}
-                  onChange={handleChange}
+                  {...register("message")}
                   className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
                   placeholder="Votre message"
                 />
+                {errors.message ? (
+                  <p className="mt-2 text-sm text-snrc-red">
+                    {errors.message.message}
+                  </p>
+                ) : null}
               </div>
 
               {feedback ? (

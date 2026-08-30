@@ -1,24 +1,38 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
+import { AuthModel } from "../models/auth.model.js";
 
-export function requireAuth(req, _res, next) {
+export async function requireAuth(req, _res, next) {
   const bearer = req.headers.authorization?.startsWith("Bearer ")
     ? req.headers.authorization.split(" ")[1]
     : null;
   const token = req.cookies?.[env.COOKIE_NAME] || bearer;
 
   if (!token) {
-    const error = new Error("Authentication required");
+    const error = new Error("Authentification requise");
+    error.status = 401;
+    return next(error);
+  }
+
+  let payload;
+  try {
+    payload = jwt.verify(token, env.JWT_SECRET);
+  } catch {
+    const error = new Error("Session invalide ou expirée");
     error.status = 401;
     return next(error);
   }
 
   try {
-    req.user = jwt.verify(token, env.JWT_SECRET);
+    const currentTokenVersion = await AuthModel.getTokenVersion(payload.id);
+    if (currentTokenVersion === null || currentTokenVersion !== payload.token_version) {
+      const error = new Error("Session invalide ou expirée");
+      error.status = 401;
+      return next(error);
+    }
+    req.user = payload;
     return next();
-  } catch {
-    const error = new Error("Invalid or expired token");
-    error.status = 401;
-    return next(error);
+  } catch (dbError) {
+    return next(dbError);
   }
 }

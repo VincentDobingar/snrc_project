@@ -6,7 +6,9 @@ const makeSlug = (value) => slugify(value || "actualite", { lower: true, strict:
 
 export const NewsController = {
   async getPublic(req, res) {
-    const news = await NewsModel.listPublic(Number(req.query.limit || 20));
+    const rawLimit = Number(req.query.limit);
+    const limit = Number.isInteger(rawLimit) && rawLimit > 0 && rawLimit <= 100 ? rawLimit : 20;
+    const news = await NewsModel.listPublic(limit);
     return ok(res, "Actualités récupérées avec succès", { news });
   },
   async getPublicBySlug(req, res, next) {

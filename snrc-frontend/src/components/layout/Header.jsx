@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { Mail, Menu, Phone, X } from "lucide-react";
-import { getSettings } from "../../api/settingsApi";
+import { useSettings } from "../../hooks/useSettings";
 
 const navItems = [
   { label: "Accueil", to: "/" },
@@ -31,13 +31,34 @@ function navLinkClass({ isActive }) {
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const [settings, setSettings] = useState(null);
+  const { settings } = useSettings();
+  const menuButtonRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+
+  function closeMenu() {
+    setOpen(false);
+    menuButtonRef.current?.focus();
+  }
 
   useEffect(() => {
-    getSettings()
-      .then(setSettings)
-      .catch(() => setSettings(null));
-  }, []);
+    if (!open) return undefined;
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        closeMenu();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
+  useEffect(() => {
+    if (open) {
+      const firstLink = mobileMenuRef.current?.querySelector("a, button");
+      firstLink?.focus();
+    }
+  }, [open]);
 
   const activeSocialLinks = socialFields.filter((item) => settings?.[item.key]);
 
@@ -97,7 +118,7 @@ export default function Header() {
             <img
               src="/images/logo-snrc.png"
               alt="Logo SNRC"
-              className="h-12 w-auto object-contain"
+              className="h-18 w-auto object-contain"
             />
 
             <div className="hidden sm:block leading-tight">
@@ -125,8 +146,11 @@ export default function Header() {
           </div>
 
           <button
+            ref={menuButtonRef}
             type="button"
             aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
             className="inline-flex rounded-xl border border-gray-200 p-2 text-snrc-blue lg:hidden"
             onClick={() => setOpen((prev) => !prev)}
           >
@@ -136,7 +160,11 @@ export default function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-gray-100 bg-white lg:hidden">
+        <div
+          id="mobile-menu"
+          ref={mobileMenuRef}
+          className="border-t border-gray-100 bg-white lg:hidden"
+        >
           <div className="container-snrc flex flex-col py-4">
             <div className="mb-4 flex flex-col gap-2 rounded-2xl bg-snrc-light p-4 text-sm text-snrc-blue">
               <a

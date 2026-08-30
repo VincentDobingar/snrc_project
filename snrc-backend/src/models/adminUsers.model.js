@@ -36,4 +36,18 @@ export const AdminUsersModel = {
     const result = await query(`DELETE FROM admins WHERE id=$1 RETURNING id`, [id]);
     return result.rows[0] || null;
   },
+  async bumpTokenVersion(id) {
+    const result = await query(
+      `UPDATE admins SET token_version = token_version + 1 WHERE id=$1 RETURNING id, token_version`,
+      [id]
+    );
+    return result.rows[0] || null;
+  },
+  async countActiveSuperadmins(excludeId) {
+    const result = await query(
+      `SELECT COUNT(*)::int AS count FROM admins WHERE role='superadmin' AND status='active' AND id != $1`,
+      [excludeId]
+    );
+    return result.rows[0]?.count ?? 0;
+  },
 };

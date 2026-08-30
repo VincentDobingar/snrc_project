@@ -254,7 +254,7 @@ export default function PagesManager() {
               value={form.banner_image}
               onChange={handleChange}
               className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
-              placeholder="/images/sections/snrc.png"
+              placeholder="/images/sections/snrc.jpg"
             />
           </div>
 

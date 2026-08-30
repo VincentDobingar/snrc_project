@@ -36,12 +36,26 @@ export const AdminUsersController = {
         return next(error);
       }
     }
+    const newRole = req.body.role ?? existing.role;
+    const newStatus = req.body.status ?? existing.status;
+    const revokesSecurity = existing.role === "superadmin" && (newStatus === "inactive" || newRole !== "superadmin");
+    if (revokesSecurity) {
+      const activeCount = await AdminUsersModel.countActiveSuperadmins(existing.id);
+      if (activeCount === 0) {
+        const error = new Error("Impossible de désactiver/supprimer le dernier superadministrateur actif");
+        error.status = 400;
+        return next(error);
+      }
+    }
     const user = await AdminUsersModel.update(req.params.id, {
       full_name: req.body.full_name ?? existing.full_name,
       email: req.body.email ?? existing.email,
-      role: req.body.role ?? existing.role,
-      status: req.body.status ?? existing.status,
+      role: newRole,
+      status: newStatus,
     });
+    if (revokesSecurity) {
+      await AdminUsersModel.bumpTokenVersion(req.params.id);
+    }
     return ok(res, "Administrateur mis à jour avec succès", { user });
   },
   async updatePassword(req, res, next) {
@@ -52,9 +66,24 @@ export const AdminUsersController = {
       return next(error);
     }
     await AdminUsersModel.updatePassword(req.params.id, await bcrypt.hash(req.body.password, 10));
+    await AdminUsersModel.bumpTokenVersion(req.params.id);
     return ok(res, "Mot de passe mis à jour avec succès");
   },
   async remove(req, res, next) {
+    const existing = await AdminUsersModel.findRawById(req.params.id);
+    if (!existing) {
+      const error = new Error("Administrateur introuvable");
+      error.status = 404;
+      return next(error);
+    }
+    if (existing.role === "superadmin") {
+      const activeCount = await AdminUsersModel.countActiveSuperadmins(existing.id);
+      if (activeCount === 0) {
+        const error = new Error("Impossible de désactiver/supprimer le dernier superadministrateur actif");
+        error.status = 400;
+        return next(error);
+      }
+    }
     const deleted = await AdminUsersModel.remove(req.params.id);
     if (!deleted) {
       const error = new Error("Administrateur introuvable");

@@ -9,6 +9,7 @@ import { requireAuth } from "../middlewares/requireAuth.js";
 import { requireRole } from "../middlewares/requireRole.js";
 import { documentUpload } from "../middlewares/upload.js";
 import { sanitizeHtmlFields } from "../middlewares/sanitizeHtmlFields.js";
+import { publicFormLimiter } from "../middlewares/rateLimiters.js";
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.get("/jobs", asyncHandler(JobsController.getPublic));
 router.get("/jobs/:slug", asyncHandler(JobsController.getPublicBySlug));
 router.post(
   "/jobs/:id/apply",
+  publicFormLimiter,
   applicationUpload,
   jobApplicationValidator,
   validateRequest,

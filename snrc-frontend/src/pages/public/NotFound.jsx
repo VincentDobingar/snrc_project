@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import Container from "../../components/ui/Container";
+import usePageMeta from "../../hooks/usePageMeta";
 
 export default function NotFound() {
   return (
     <section className="section-snrc bg-snrc-light">
+      {usePageMeta({ title: "Page introuvable", noindex: true })}
+
       <Container>
         <div className="card-snrc mx-auto max-w-3xl p-10 text-center">
           <span className="inline-flex rounded-full bg-snrc-red/10 px-3 py-1 text-sm font-semibold text-snrc-red">

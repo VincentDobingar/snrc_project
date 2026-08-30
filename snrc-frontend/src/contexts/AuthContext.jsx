@@ -3,12 +3,21 @@ import { getMe, loginAdmin, logoutAdmin } from "../api/authApi";
 
 export const AuthContext = createContext(null);
 
+const isAdminPath = () =>
+  typeof window !== "undefined" &&
+  window.location.pathname.startsWith("/admin");
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [bootLoading, setBootLoading] = useState(true);
+  // Les pages publiques n'ont jamais besoin de l'état d'authentification
+  // admin : on évite donc un appel réseau /me systématique à chaque
+  // chargement du site, et on ne le déclenche que sous /admin.
+  const [bootLoading, setBootLoading] = useState(isAdminPath);
   const [authLoading, setAuthLoading] = useState(false);
 
   useEffect(() => {
+    if (!isAdminPath()) return;
+
     async function bootstrapAuth() {
       try {
         const currentUser = await getMe();

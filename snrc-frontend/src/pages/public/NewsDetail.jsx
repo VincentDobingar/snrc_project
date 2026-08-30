@@ -6,26 +6,7 @@ import Container from "../../components/ui/Container";
 import RichContent from "../../components/ui/RichContent";
 import { getNewsBySlug } from "../../api/newsApi";
 import usePageMeta from "../../hooks/usePageMeta";
-
-const uploadsBaseUrl = import.meta.env.VITE_UPLOADS_BASE_URL || "";
-
-function resolveMediaUrl(path) {
-  if (!path) return null;
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  if (path.startsWith("/images/")) return path;
-  return `${uploadsBaseUrl}${path.startsWith("/") ? path : `/${path}`}`;
-}
-
-function formatDate(value) {
-  if (!value) return "Communication institutionnelle";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Communication institutionnelle";
-  return date.toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
+import { resolveMediaUrl, formatDate } from "../../utils/media";
 
 export default function NewsDetail() {
   const { slug } = useParams();
@@ -90,7 +71,7 @@ export default function NewsDetail() {
         title={news.title}
         subtitle={news.summary}
         badge="Actualité"
-        backgroundImage="/images/sections/snrc.png"
+        backgroundImage="/images/sections/snrc.jpg"
       />
 
       <section className="section-snrc bg-white">
@@ -108,9 +89,9 @@ export default function NewsDetail() {
             {formatDate(news.published_at)}
           </div>
 
-          <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-snrc-blue sm:text-4xl">
+          <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-snrc-blue sm:text-4xl">
             {news.title}
-          </h1>
+          </h2>
 
           {news.featured_image ? (
             <div className="mt-8 overflow-hidden rounded-[1.75rem]">

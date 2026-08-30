@@ -3,7 +3,11 @@ import { body } from "express-validator";
 export const createAdminUserValidator = [
   body("full_name").trim().notEmpty().withMessage("Nom complet requis"),
   body("email").isEmail().withMessage("Email invalide"),
-  body("password").isLength({ min: 6 }).withMessage("Le mot de passe doit contenir au moins 6 caractères"),
+  body("password")
+    .isLength({ min: 10 })
+    .withMessage("Le mot de passe doit contenir au moins 10 caractères")
+    .matches(/(?=.*[A-Za-z])(?=.*\d)/)
+    .withMessage("Le mot de passe doit contenir au moins une lettre et un chiffre"),
   body("role").optional().isIn(["superadmin", "admin_editeur"]).withMessage("Rôle invalide"),
   body("status").optional().isIn(["active", "inactive"]).withMessage("Statut invalide"),
 ];
@@ -16,5 +20,9 @@ export const updateAdminUserValidator = [
 ];
 
 export const updatePasswordValidator = [
-  body("password").isLength({ min: 6 }).withMessage("Le mot de passe doit contenir au moins 6 caractères"),
+  body("password")
+    .isLength({ min: 10 })
+    .withMessage("Le mot de passe doit contenir au moins 10 caractères")
+    .matches(/(?=.*[A-Za-z])(?=.*\d)/)
+    .withMessage("Le mot de passe doit contenir au moins une lettre et un chiffre"),
 ];

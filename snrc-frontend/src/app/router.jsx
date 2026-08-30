@@ -75,8 +75,13 @@ const router = createBrowserRouter([
           { path: "messages", element: <MessagesManager /> },
           { path: "recrutements", element: <JobsManager /> },
           { path: "candidatures", element: <JobApplicationsManager /> },
-          { path: "administrateurs", element: <AdminUsersManager /> },
-          { path: "parametres", element: <SettingsManager /> },
+          {
+            element: <ProtectedRoute allowedRoles={["superadmin"]} />,
+            children: [
+              { path: "administrateurs", element: <AdminUsersManager /> },
+              { path: "parametres", element: <SettingsManager /> },
+            ],
+          },
           { path: "*", element: <Navigate to="/admin" replace /> },
         ],
       },

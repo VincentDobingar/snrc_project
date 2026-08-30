@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -12,7 +12,7 @@ import {
   Phone,
   ShieldCheck,
 } from "lucide-react";
-import { getSettings } from "../../api/settingsApi";
+import { useSettings } from "../../hooks/useSettings";
 
 const socialLinks = [
   { key: "facebook_url", label: "Facebook" },
@@ -63,14 +63,8 @@ function cleanTel(phone) {
 }
 
 export default function Footer() {
-  const [settings, setSettings] = useState(null);
+  const { settings } = useSettings();
   const [logoSrc, setLogoSrc] = useState("/images/logo-snrc1.png");
-
-  useEffect(() => {
-    getSettings()
-      .then(setSettings)
-      .catch(() => setSettings(null));
-  }, []);
 
   const phones = useMemo(() => buildPhoneLines(settings), [settings]);
 
@@ -133,7 +127,7 @@ export default function Footer() {
     src={logoSrc}
     alt="Logo SNRC"
     className="h-full w-full object-contain drop-shadow-2xl"
-    onError={() => setLogoSrc("/images/logo-snrc1.png")}
+    onError={() => setLogoSrc("/images/logo-snrc.png")}
   />
 </span>
 

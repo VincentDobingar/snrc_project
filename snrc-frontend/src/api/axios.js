@@ -37,13 +37,26 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("Erreur API SNRC :", {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-      url: error.config?.url,
-      baseURL: error.config?.baseURL,
-    });
+    if (import.meta.env.DEV) {
+      console.error("Erreur API SNRC :", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        url: error.config?.url,
+        baseURL: error.config?.baseURL,
+      });
+    }
+
+    const status = error.response?.status;
+    const pathname = window.location.pathname;
+
+    if (
+      status === 401 &&
+      pathname.startsWith("/admin") &&
+      pathname !== "/admin/login"
+    ) {
+      window.location.href = "/admin/login";
+    }
 
     return Promise.reject(error);
   }

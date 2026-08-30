@@ -62,7 +62,9 @@ export default function Dashboard() {
         setFaqs(faqData || []);
         setUsers(usersData || []);
       } catch (error) {
-        console.error("Erreur chargement dashboard :", error);
+        if (import.meta.env.DEV) {
+          console.error("Erreur chargement dashboard :", error);
+        }
       } finally {
         setLoading(false);
       }

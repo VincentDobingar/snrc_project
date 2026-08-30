@@ -9,6 +9,15 @@ export const ServicesController = {
     const services = await ServicesModel.listPublic();
     return ok(res, "Services récupérés avec succès", { services });
   },
+  async getPublicBySlug(req, res, next) {
+    const service = await ServicesModel.findBySlug(req.params.slug);
+    if (!service) {
+      const error = new Error("Service introuvable");
+      error.status = 404;
+      return next(error);
+    }
+    return ok(res, "Service récupéré avec succès", { service });
+  },
   async getAll(_req, res) {
     const services = await ServicesModel.listAll();
     return ok(res, "Services récupérés avec succès", { services });

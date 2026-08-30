@@ -7,12 +7,18 @@ function required(name, fallback = "") {
   return process.env[name] || fallback;
 }
 
-function requireSecret(name) {
+function requireSecret(name, { minLength = 0 } = {}) {
   const value = process.env[name];
   if (!value || INSECURE_DEFAULTS.has(value)) {
     throw new Error(
       `Variable d'environnement ${name} manquante ou non sécurisée. ` +
         `Définis une valeur forte et unique dans .env avant de démarrer le serveur.`
+    );
+  }
+  if (minLength && value.length < minLength) {
+    throw new Error(
+      `Variable d'environnement ${name} trop courte (${value.length} caractères). ` +
+        `Utilise une valeur d'au moins ${minLength} caractères dans .env avant de démarrer le serveur.`
     );
   }
   return value;
@@ -22,6 +28,7 @@ export const env = {
   PORT: Number(required("PORT", 5000)),
   NODE_ENV: required("NODE_ENV", "development"),
   APP_URL: required("APP_URL", "http://localhost:5173"),
+  API_URL: required("API_URL", "http://localhost:5000"),
   ALLOWED_ORIGINS: required("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:4173")
     .split(",")
     .map((value) => value.trim())
@@ -30,8 +37,12 @@ export const env = {
   DB_PORT: Number(required("DB_PORT", 5432)),
   DB_NAME: required("DB_NAME", "snrc_db"),
   DB_USER: required("DB_USER", "postgres"),
+  // DB_PASSWORD n'est pas soumis au minimum de 32 caractères : c'est souvent un
+  // identifiant fourni par l'hébergeur (longueur hors de notre contrôle), protégé
+  // par le réseau plutôt que par sa seule entropie. On garde le rejet des valeurs
+  // par défaut connues (ex. "postgres").
   DB_PASSWORD: requireSecret("DB_PASSWORD"),
-  JWT_SECRET: requireSecret("JWT_SECRET"),
+  JWT_SECRET: requireSecret("JWT_SECRET", { minLength: 32 }),
   JWT_EXPIRES_IN: required("JWT_EXPIRES_IN", "1d"),
   COOKIE_NAME: required("COOKIE_NAME", "snrc_token"),
   // Domaine partagé (ex: ".snrc.td") pour que le cookie CSRF, non httpOnly, reste

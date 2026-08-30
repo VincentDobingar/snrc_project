@@ -86,7 +86,7 @@ export default function Publications() {
         subtitle={summary}
         badge="Publications"
         light
-        backgroundImage="/images/sections/snrc.png"
+        backgroundImage="/images/sections/snrc.jpg"
       />
 
       <section className="section-snrc bg-white">
@@ -111,7 +111,7 @@ export default function Publications() {
 
           <div className="card-snrc overflow-hidden rounded-[1.75rem]">
             <img
-              src={page?.banner_image || "/images/sections/snrc.png"}
+              src={page?.banner_image || "/images/sections/snrc.jpg"}
               alt={title}
               className="h-96 w-full object-cover transition-transform duration-700 hover:scale-105"
             />

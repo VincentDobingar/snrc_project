@@ -2,7 +2,7 @@ import { ok } from "../utils/apiResponse.js";
 import { env } from "../config/env.js";
 
 function buildPublicUrl(relativePath) {
-  const baseUrl = (env.APP_URL || "").replace(/\/+$/, "");
+  const baseUrl = (env.API_URL || "").replace(/\/+$/, "");
   return `${baseUrl}${relativePath}`;
 }
 

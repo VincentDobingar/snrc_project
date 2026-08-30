@@ -11,6 +11,10 @@ export const pool = new Pool({
   password: env.DB_PASSWORD,
 });
 
+pool.on("error", (err) => {
+  console.error("Erreur inattendue du pool PostgreSQL :", err);
+});
+
 export async function query(text, params = []) {
   return pool.query(text, params);
 }

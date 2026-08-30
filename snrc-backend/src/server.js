@@ -1,7 +1,8 @@
 // src/server.js
 import app from "./app.js";
+import { env } from "./config/env.js";
 
-const PORT = process.env.PORT || 5000;
+const PORT = env.PORT;
 
 app.listen(PORT, () => {
   console.log(`✅ SNRC API running on port ${PORT}`);

@@ -239,7 +239,7 @@ export default function FAQ() {
   }, []);
 
   const displayedFaqs = useMemo(() => {
-    const allFaqs = [...officialFaqs, ...faqs];
+    const allFaqs = [...faqs, ...officialFaqs];
     const seen = new Set();
 
     return allFaqs.filter((item) => {
@@ -262,7 +262,7 @@ export default function FAQ() {
         title="FAQ"
         subtitle="Questions fréquentes sur les informations, services, publications et le cadre juridique de la SNRC."
         badge="FAQ"
-        backgroundImage="/images/sections/snrc.png"
+        backgroundImage="/images/sections/snrc.jpg"
       />
 
       <section className="section-snrc bg-snrc-light">

@@ -59,7 +59,7 @@ export default function Missions() {
         title={title}
         subtitle={summary}
         badge="Missions"
-        backgroundImage="/images/sections/snrc.png"
+        backgroundImage="/images/sections/snrc.jpg"
       />
 
       <section className="section-snrc bg-white">
@@ -78,7 +78,7 @@ export default function Missions() {
 
           <div className="card-snrc overflow-hidden rounded-[1.75rem]">
             <img
-              src={page?.banner_image || "/images/sections/snrc.png"}
+              src={page?.banner_image || "/images/sections/snrc.jpg"}
               alt={title}
               className="h-96 w-full object-cover transition-transform duration-700 hover:scale-105"
             />

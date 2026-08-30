@@ -7,7 +7,7 @@ function ensureDir(dir) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-function sanitizeFilename(originalname = "file") {
+export function sanitizeFilename(originalname = "file") {
   const ext = path.extname(originalname).toLowerCase();
   const base = path
     .basename(originalname, ext)
@@ -29,20 +29,50 @@ function createStorage(targetFolder) {
   });
 }
 
-function buildFileFilter(allowedMimePrefixes = [], allowedMimeTypes = []) {
+export function buildFileFilter(allowedMimeTypes = [], allowedExtensions = []) {
   return (_req, file, cb) => {
-    const okPrefix = allowedMimePrefixes.some((prefix) => file.mimetype.startsWith(prefix));
     const okType = allowedMimeTypes.includes(file.mimetype);
-    if (okPrefix || okType) return cb(null, true);
+    const ext = path.extname(file.originalname).toLowerCase();
+    const okExt = allowedExtensions.includes(ext);
+    if (okType && okExt) return cb(null, true);
     return cb(new Error("Unsupported file type"));
   };
 }
+
+export const IMAGE_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+export const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
+
+export const DOCUMENT_MIME_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-excel",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+];
+export const DOCUMENT_EXTENSIONS = [
+  ".pdf",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx",
+  ".ppt",
+  ".pptx",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".webp",
+];
 
 export function imageUpload(targetFolder = "images") {
   return multer({
     storage: createStorage(targetFolder),
     limits: { fileSize: env.MAX_FILE_SIZE },
-    fileFilter: buildFileFilter(["image/"], []),
+    fileFilter: buildFileFilter(IMAGE_MIME_TYPES, IMAGE_EXTENSIONS),
   });
 }
 
@@ -50,17 +80,6 @@ export function documentUpload(targetFolder = "documents") {
   return multer({
     storage: createStorage(targetFolder),
     limits: { fileSize: env.MAX_FILE_SIZE },
-    fileFilter: buildFileFilter([], [
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.ms-excel",
-      "application/vnd.ms-powerpoint",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "image/png",
-      "image/jpeg",
-      "image/webp",
-    ]),
+    fileFilter: buildFileFilter(DOCUMENT_MIME_TYPES, DOCUMENT_EXTENSIONS),
   });
 }

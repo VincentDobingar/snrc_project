@@ -32,12 +32,43 @@ export default function RichEditorField({
 }) {
   const editorRef = useRef(null);
   const [htmlMode, setHtmlMode] = useState(false);
+  const [activeFormats, setActiveFormats] = useState({});
 
   useEffect(() => {
     if (!htmlMode && editorRef.current && editorRef.current.innerHTML !== (value || "")) {
       editorRef.current.innerHTML = value || "";
     }
   }, [value, htmlMode]);
+
+  function updateActiveFormats() {
+    if (htmlMode || !editorRef.current) return;
+
+    const selection = window.getSelection();
+    if (!selection || !editorRef.current.contains(selection.anchorNode)) return;
+
+    let formatBlockValue = "";
+    try {
+      formatBlockValue = (document.queryCommandValue("formatBlock") || "").toLowerCase();
+    } catch {
+      formatBlockValue = "";
+    }
+
+    setActiveFormats({
+      bold: document.queryCommandState("bold"),
+      italic: document.queryCommandState("italic"),
+      insertUnorderedList: document.queryCommandState("insertUnorderedList"),
+      insertOrderedList: document.queryCommandState("insertOrderedList"),
+      h2: formatBlockValue === "h2",
+      blockquote: formatBlockValue === "blockquote",
+    });
+  }
+
+  useEffect(() => {
+    if (htmlMode) return undefined;
+    document.addEventListener("selectionchange", updateActiveFormats);
+    return () => document.removeEventListener("selectionchange", updateActiveFormats);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [htmlMode]);
 
   function syncContent() {
     onChange(editorRef.current?.innerHTML || "");
@@ -47,6 +78,7 @@ export default function RichEditorField({
     editorRef.current?.focus();
     document.execCommand(command, false, arg);
     syncContent();
+    updateActiveFormats();
   }
 
   function handleLink() {
@@ -88,31 +120,37 @@ export default function RichEditorField({
       icon: Bold,
       label: "Gras",
       action: () => exec("bold"),
+      stateKey: "bold",
     },
     {
       icon: Italic,
       label: "Italique",
       action: () => exec("italic"),
+      stateKey: "italic",
     },
     {
       icon: Heading2,
       label: "Titre",
       action: () => exec("formatBlock", "h2"),
+      stateKey: "h2",
     },
     {
       icon: Quote,
       label: "Citation",
       action: () => exec("formatBlock", "blockquote"),
+      stateKey: "blockquote",
     },
     {
       icon: List,
       label: "Liste à puces",
       action: () => exec("insertUnorderedList"),
+      stateKey: "insertUnorderedList",
     },
     {
       icon: ListOrdered,
       label: "Liste numérotée",
       action: () => exec("insertOrderedList"),
+      stateKey: "insertOrderedList",
     },
     {
       icon: Link2,
@@ -158,6 +196,9 @@ export default function RichEditorField({
                   onClick={tool.action}
                   className="editor-tool-btn"
                   title={tool.label}
+                  aria-pressed={
+                    tool.stateKey ? Boolean(activeFormats[tool.stateKey]) : undefined
+                  }
                 >
                   <Icon size={16} />
                   <span>{tool.label}</span>

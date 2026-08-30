@@ -130,7 +130,7 @@ export default function JobDetail() {
         title={job.title}
         subtitle={job.summary}
         badge="Carrières"
-        backgroundImage="/images/sections/snrc.png"
+        backgroundImage="/images/sections/snrc.jpg"
       />
 
       <section className="section-snrc bg-white">
@@ -166,9 +166,9 @@ export default function JobDetail() {
               ) : null}
             </div>
 
-            <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-snrc-blue sm:text-4xl">
+            <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-snrc-blue sm:text-4xl">
               {job.title}
-            </h1>
+            </h2>
 
             <RichContent content={job.description} className="mt-6" />
 

@@ -68,10 +68,24 @@ export default function AdminUsersManager() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function isPasswordValid(pwd) {
+    return (
+      pwd.length >= 10 && /[A-Za-z]/.test(pwd) && /[0-9]/.test(pwd)
+    );
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
-    setSaving(true);
     setFeedback("");
+
+    if (!editingId && !isPasswordValid(form.password)) {
+      setFeedback(
+        "Le mot de passe doit contenir au moins 10 caractères, avec au moins une lettre et un chiffre."
+      );
+      return;
+    }
+
+    setSaving(true);
 
     try {
       if (editingId) {
@@ -249,9 +263,13 @@ export default function AdminUsersManager() {
                 name="password"
                 value={form.password}
                 onChange={handleChange}
+                minLength={10}
                 className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
                 placeholder="Mot de passe"
               />
+              <p className="mt-2 text-sm text-snrc-blue/70">
+                Au moins 10 caractères, avec au moins une lettre et un chiffre.
+              </p>
             </div>
           ) : null}
         </div>

@@ -1,11 +1,13 @@
 import sanitizeHtml from "sanitize-html";
 
 const SANITIZE_OPTIONS = {
-  allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2", "u", "span"]),
+  allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2", "u", "span", "video", "source"]),
   allowedAttributes: {
     ...sanitizeHtml.defaults.allowedAttributes,
     img: ["src", "alt", "title", "width", "height"],
     a: ["href", "name", "target", "rel"],
+    video: ["src", "controls", "poster", "width", "height", "preload"],
+    source: ["src", "type"],
     "*": ["style", "class"],
   },
   allowedSchemes: ["http", "https", "mailto"],

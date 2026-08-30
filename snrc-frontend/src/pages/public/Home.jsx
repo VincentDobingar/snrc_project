@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
   BadgeCheck,
   Banknote,
   BarChart3,
   Building2,
+  Calendar,
   CheckCircle2,
   ChevronRight,
   FileText,
@@ -17,12 +18,16 @@ import {
   MapPin,
   Megaphone,
   Phone,
+  Play,
   Scale,
   ShieldCheck,
   Sparkles,
   Users,
+  X,
 } from "lucide-react";
 import usePageMeta from "../../hooks/usePageMeta";
+import { getNews } from "../../api/newsApi";
+import { resolveMediaUrl, formatDate } from "../../utils/media";
 
 /* -------------------------------------------------------
    Composant local pour éviter l’erreur d’import "@/..."
@@ -61,7 +66,10 @@ function SectionHeader({
   title,
   description,
   align = "center",
+  tone = "dark",
 }) {
+  const isLight = tone === "light";
+
   return (
     <motion.div
       variants={fadeUp}
@@ -73,18 +81,32 @@ function SectionHeader({
       }`}
     >
       {eyebrow && (
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-800">
+        <div
+          className={`mb-3 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold ${
+            isLight
+              ? "border-white/20 bg-white/10 text-blue-100 backdrop-blur"
+              : "border-blue-200 bg-blue-50 text-blue-800"
+          }`}
+        >
           <Sparkles size={16} />
           {eyebrow}
         </div>
       )}
 
-      <h2 className="text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
+      <h2
+        className={`text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl ${
+          isLight ? "text-white" : "text-slate-950"
+        }`}
+      >
         {title}
       </h2>
 
       {description && (
-        <p className="mt-5 text-base leading-8 text-slate-600 sm:text-lg">
+        <p
+          className={`mt-5 text-base leading-8 sm:text-lg ${
+            isLight ? "text-blue-50" : "text-slate-600"
+          }`}
+        >
           {description}
         </p>
       )}
@@ -97,25 +119,11 @@ function SectionHeader({
 ------------------------------------------------------- */
 const heroSlides = [
   {
-    image: "/images/sections/snrc.png",
+    image: "/images/sections/snrc.jpg",
     badge: "Institution publique • République du Tchad",
     title: "Société Nationale de Recouvrement des Créances",
     subtitle:
       "Un acteur institutionnel engagé pour le recouvrement, la transparence financière et la consolidation des créances publiques et parapubliques.",
-  },
-  {
-    image: "/images/sections/snrc-building.jpg",
-    badge: "Recouvrement • Gouvernance • Performance",
-    title: "Une institution au service de la souveraineté financière",
-    subtitle:
-      "La SNRC accompagne l’État, les institutions publiques et les partenaires dans la sécurisation et la valorisation des créances.",
-  },
-  {
-    image: "/images/sections/administration-publique.jpg",
-    badge: "Modernisation • Suivi • Redevabilité",
-    title: "Une approche moderne du recouvrement institutionnel",
-    subtitle:
-      "Des outils, des procédures et une gouvernance orientés résultats pour renforcer l’efficacité du recouvrement.",
   },
 ];
 
@@ -201,7 +209,7 @@ const governanceStructure = [
     icon: Landmark,
     title: "Tutelle",
     detail:
-      "Ministre des Finances, du Budget, de l’Economie, du Plan et de la Coopération Internationale",
+      "Ministre d'Etat, Ministre des Finances, du Budget, de l’Economie, du Plan et de la Coopération Internationale",
     name: "M. Tahir Hamid Nguilin",
   },
   {
@@ -289,6 +297,243 @@ const newsItems = [
 
 const CHAD_EMBLEM = "/images/brand/armoirie-tchad.png";
 
+const discoursVideos = [
+  {
+    id: "discours-dg",
+    type: "video",
+    video: "/uploads/videos/discours-dg-lancement-snrc.mp4",
+    title: "Discours de la Directrice Générale — Lancement de la SNRC",
+    summary:
+      "Allocution de Mme Ramada Abderahim Ndiaye, Directrice Générale, à l’occasion du lancement de la SNRC.",
+  },
+  {
+    id: "discours-ministre",
+    type: "video",
+    video: "/uploads/videos/discours-ministre-lancement-snrc.mp4",
+    title: "Discours du Ministre — Lancement de la SNRC",
+    summary:
+      "Allocution de M. Tahir Hamid Nguilin, Ministre d’État, Ministre des Finances, à l’occasion du lancement de la SNRC.",
+  },
+];
+
+/* -------------------------------------------------------
+   Lightbox (agrandissement image / lecture vidéo)
+------------------------------------------------------- */
+function GalleryLightbox({ item, onClose }) {
+  const closeButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
+
+  useEffect(() => {
+    function handleKey(event) {
+      if (event.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  useEffect(() => {
+    previouslyFocusedRef.current = document.activeElement;
+    closeButtonRef.current?.focus();
+
+    return () => {
+      if (
+        previouslyFocusedRef.current &&
+        typeof previouslyFocusedRef.current.focus === "function"
+      ) {
+        previouslyFocusedRef.current.focus();
+      }
+    };
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Aperçu du média"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/95 p-4 backdrop-blur-sm sm:p-8"
+      onClick={onClose}
+    >
+      <button
+        ref={closeButtonRef}
+        type="button"
+        onClick={onClose}
+        aria-label="Fermer"
+        className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white backdrop-blur transition hover:bg-white/20"
+      >
+        <X size={22} />
+      </button>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+        className="w-full max-w-4xl"
+        onClick={(event) => event.stopPropagation()}
+      >
+        {item.type === "video" ? (
+          <video
+            src={resolveMediaUrl(item.video)}
+            controls
+            autoPlay
+            playsInline
+            className="max-h-[75vh] w-full rounded-2xl bg-black shadow-2xl"
+          />
+        ) : (
+          <img
+            src={resolveMediaUrl(item.featured_image)}
+            alt={item.title}
+            className="max-h-[75vh] w-full rounded-2xl object-contain shadow-2xl"
+          />
+        )}
+
+        <div className="mt-5 text-center text-white">
+          <h3 className="text-xl font-black leading-tight sm:text-2xl">
+            {item.title}
+          </h3>
+
+          {item.summary && (
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-7 text-blue-100">
+              {item.summary}
+            </p>
+          )}
+
+          {item.type !== "video" && item.slug && (
+            <Link
+              to={`/actualites/${item.slug}`}
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-blue-700"
+            >
+              Lire l’actualité
+              <ArrowRight size={17} />
+            </Link>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* -------------------------------------------------------
+   Galerie & actualités (bande défilante en boucle)
+------------------------------------------------------- */
+function NewsGallerySlideshow() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getNews()
+      .then((data) => {
+        if (cancelled) return;
+        const newsSlides = (data || [])
+          .filter((item) => item.featured_image)
+          .slice(0, 8);
+        setItems([...discoursVideos, ...newsSlides]);
+      })
+      .catch((error) => {
+        console.warn(
+          "Impossible de charger les actualités pour la page d'accueil",
+          error
+        );
+        if (!cancelled) setItems([...discoursVideos]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading || items.length === 0) return null;
+
+  const loopItems = [...items, ...items];
+  const lightboxItem = lightboxIndex !== null ? items[lightboxIndex] : null;
+
+  return (
+    <section className="relative overflow-hidden bg-slate-950 py-24 text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(37,99,235,0.28),transparent_30%),radial-gradient(circle_at_85%_60%,rgba(14,165,233,0.16),transparent_32%)]" />
+
+      <Container className="relative z-10">
+        <SectionHeader
+          align="left"
+          tone="light"
+          eyebrow="Galerie & actualités"
+          title="Ce qui marque la vie institutionnelle de la SNRC."
+          description="Un aperçu en images des temps forts et des dernières actualités publiées par l’institution. Cliquez sur une vignette pour l’agrandir."
+        />
+      </Container>
+
+      <div className="group relative z-10 mt-4">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-slate-950 to-transparent sm:w-24" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-slate-950 to-transparent sm:w-24" />
+
+        <div className="marquee-track flex w-max gap-6 px-4 sm:px-6 lg:px-8">
+          {loopItems.map((item, index) => (
+            <button
+              key={`${item.id}-${index}`}
+              type="button"
+              onClick={() => setLightboxIndex(index % items.length)}
+              aria-label={`Agrandir : ${item.title}`}
+              className="group/card relative h-72 w-[300px] shrink-0 overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-900 shadow-xl transition hover:-translate-y-1 sm:h-80 sm:w-[360px]"
+            >
+              {item.type === "video" ? (
+                <>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(37,99,235,0.55),transparent_55%),linear-gradient(160deg,#0f172a,#1e293b)]" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-blue-700 shadow-lg transition group-hover/card:scale-110">
+                      <Play size={24} fill="currentColor" className="ml-1" />
+                    </span>
+                  </div>
+                  <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-black/40 px-3 py-1.5 text-xs font-semibold text-blue-100 backdrop-blur">
+                    <Megaphone size={14} />
+                    Discours officiel
+                  </div>
+                </>
+              ) : (
+                <img
+                  src={resolveMediaUrl(item.featured_image)}
+                  alt={item.title}
+                  className="h-full w-full object-cover transition duration-500 group-hover/card:scale-105"
+                  loading="lazy"
+                />
+              )}
+
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/10 to-transparent" />
+
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 text-left">
+                {item.type !== "video" && (
+                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-blue-200">
+                    <Calendar size={14} />
+                    {formatDate(item.published_at)}
+                  </div>
+                )}
+                <p className="line-clamp-2 text-sm font-bold leading-6 text-white">
+                  {item.title}
+                </p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {lightboxItem && (
+          <GalleryLightbox
+            item={lightboxItem}
+            onClose={() => setLightboxIndex(null)}
+          />
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}
+
 /* -------------------------------------------------------
    Page Home
 ------------------------------------------------------- */
@@ -368,14 +613,23 @@ export default function Home() {
 
               <motion.h1
                 variants={fadeUp}
-                className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-7xl"
+                className="text-3xl font-black leading-tight tracking-tight text-white sm:text-4xl lg:text-6xl"
               >
                 {currentSlide.title}
               </motion.h1>
 
               <motion.p
                 variants={fadeUp}
-                className="mt-7 max-w-3xl text-lg leading-8 text-blue-50 sm:text-xl"
+                className="mt-5 max-w-3xl border-l-4 border-blue-400 pl-4 text-base font-semibold italic leading-7 text-blue-50 sm:text-lg"
+              >
+                « La Société Nationale de Recouvrement des Créances (SNRC)
+                illustre la volonté des plus hautes autorités de rétablir la
+                justice et l’équité dans l’accès au crédit et l’investissement. »
+              </motion.p>
+
+              <motion.p
+                variants={fadeUp}
+                className="mt-5 max-w-3xl text-base leading-7 text-blue-50 sm:text-lg"
               >
                 {currentSlide.subtitle}
               </motion.p>
@@ -570,6 +824,9 @@ export default function Home() {
         </Container>
       </section>
 
+      {/* GALERIE & ACTUALITÉS (diaporama) */}
+      <NewsGallerySlideshow />
+
       {/* POURQUOI CRÉER LA SNRC MAINTENANT */}
       <section className="relative overflow-hidden bg-[#2f4697] py-24 text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(255,255,255,0.12),transparent_28%),radial-gradient(circle_at_85%_60%,rgba(15,23,42,0.22),transparent_35%)]" />
@@ -664,7 +921,7 @@ export default function Home() {
 
               <div className="relative overflow-hidden rounded-[2rem] border border-slate-100 bg-slate-100 shadow-2xl">
                 <img
-                  src="/images/sections/snrc3.png"
+                  src="/images/sections/snrc3.jpg"
                   alt="Bâtiment institutionnel SNRC"
                   className="h-[520px] w-full object-cover"
                   loading="lazy"
@@ -731,7 +988,7 @@ export default function Home() {
               <div className="mt-9 flex flex-col gap-4 sm:flex-row">
                 <Link
                   to="/la-snrc"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-7 py-4 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-blue-700"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-7 py-4 text-sm font-bold text-white shadow-lg shadow-blue-900/20 transition hover:-translate-y-0.5 hover:bg-blue-700"
                 >
                   En savoir plus
                   <ChevronRight size={18} />

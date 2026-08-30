@@ -53,7 +53,7 @@ export default function Jobs() {
         title={title}
         subtitle={summary}
         badge="Carrières"
-        backgroundImage="/images/sections/snrc.png"
+        backgroundImage="/images/sections/snrc.jpg"
       />
 
       <section className="section-snrc bg-white">

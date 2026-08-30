@@ -8,6 +8,7 @@ import { requireRole } from "../middlewares/requireRole.js";
 import { sanitizeHtmlFields } from "../middlewares/sanitizeHtmlFields.js";
 const router = Router();
 router.get("/services", asyncHandler(ServicesController.getPublic));
+router.get("/services/:slug", asyncHandler(ServicesController.getPublicBySlug));
 router.get("/admin/services", requireAuth, requireRole("superadmin","admin_editeur"), asyncHandler(ServicesController.getAll));
 router.post("/admin/services", requireAuth, requireRole("superadmin","admin_editeur"), sanitizeHtmlFields("content"), serviceValidator, validateRequest, asyncHandler(ServicesController.create));
 router.put("/admin/services/:id", requireAuth, requireRole("superadmin","admin_editeur"), sanitizeHtmlFields("content"), serviceValidator, validateRequest, asyncHandler(ServicesController.update));

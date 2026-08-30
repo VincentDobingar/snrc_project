@@ -1,0 +1,54 @@
+# =========================================================
+# SNRC - Site institutionnel - Configuration Apache
+# En-têtes de sécurité HTTP + routage SPA (React Router)
+# =========================================================
+
+<IfModule mod_headers.c>
+  # Empêche l'affichage du site dans une iframe d'un autre domaine (clickjacking)
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Empêche le navigateur de deviner le type MIME d'un fichier (protection XSS)
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Limite les informations transmises dans l'en-tête Referer vers d'autres sites
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Désactive les API navigateur sensibles, non utilisées par le site
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+
+  # Force HTTPS pendant 1 an, y compris sur les sous-domaines (api.snrc.td, www.snrc.td)
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # Isolation vis-à-vis des autres origines
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+
+  # Politique de sécurité du contenu : n'autorise que les ressources du site
+  # lui-même et l'API SNRC (api.snrc.td) pour les scripts, images, appels réseau, etc.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://api.snrc.td; font-src 'self' data:; media-src 'self' https://api.snrc.td; connect-src 'self' https://api.snrc.td; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+
+  # Retire les en-têtes qui révèlent la technologie serveur sous-jacente
+  Header unset X-Powered-By
+  Header unset Server
+</IfModule>
+
+# Interdit la liste des fichiers d'un dossier si index.html est absent
+Options -Indexes
+
+# Empêche l'accès direct à ce fichier de configuration
+<Files ".htaccess">
+  Require all denied
+</Files>
+
+# =========================================================
+# Routage SPA : toute URL qui ne correspond pas à un fichier
+# ou dossier existant est redirigée vers index.html
+# (nécessaire pour React Router en mode "browser")
+# =========================================================
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>

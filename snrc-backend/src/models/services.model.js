@@ -13,6 +13,13 @@ export const ServicesModel = {
     const result = await query(`SELECT * FROM services WHERE id=$1 LIMIT 1`, [id]);
     return result.rows[0] || null;
   },
+  async findBySlug(slug) {
+    const result = await query(
+      `SELECT * FROM services WHERE slug=$1 AND status='published' LIMIT 1`,
+      [slug]
+    );
+    return result.rows[0] || null;
+  },
   async create(payload) {
     const result = await query(
       `INSERT INTO services (title, slug, summary, content, icon, image, display_order, status)

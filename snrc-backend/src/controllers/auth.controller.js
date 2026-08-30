@@ -8,7 +8,13 @@ import { issueCsrfToken, clearCsrfToken } from "../utils/csrf.js";
 
 function signToken(user) {
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role, full_name: user.full_name },
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      full_name: user.full_name,
+      token_version: user.token_version,
+    },
     env.JWT_SECRET,
     { expiresIn: env.JWT_EXPIRES_IN }
   );

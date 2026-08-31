@@ -293,10 +293,14 @@ export default function Contact() {
 
             <form className="mt-6 space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
               <div>
-                <label className="mb-2 block font-medium text-snrc-blue">
+                <label
+                  htmlFor="contact-full_name"
+                  className="mb-2 block font-medium text-snrc-blue"
+                >
                   Nom complet
                 </label>
                 <input
+                  id="contact-full_name"
                   type="text"
                   {...register("full_name")}
                   className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
@@ -310,10 +314,14 @@ export default function Contact() {
               </div>
 
               <div>
-                <label className="mb-2 block font-medium text-snrc-blue">
+                <label
+                  htmlFor="contact-email"
+                  className="mb-2 block font-medium text-snrc-blue"
+                >
                   Email
                 </label>
                 <input
+                  id="contact-email"
                   type="email"
                   {...register("email")}
                   className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
@@ -327,10 +335,14 @@ export default function Contact() {
               </div>
 
               <div>
-                <label className="mb-2 block font-medium text-snrc-blue">
+                <label
+                  htmlFor="contact-phone"
+                  className="mb-2 block font-medium text-snrc-blue"
+                >
                   Téléphone
                 </label>
                 <input
+                  id="contact-phone"
                   type="text"
                   {...register("phone")}
                   className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
@@ -344,10 +356,14 @@ export default function Contact() {
               </div>
 
               <div>
-                <label className="mb-2 block font-medium text-snrc-blue">
+                <label
+                  htmlFor="contact-subject"
+                  className="mb-2 block font-medium text-snrc-blue"
+                >
                   Sujet
                 </label>
                 <input
+                  id="contact-subject"
                   type="text"
                   {...register("subject")}
                   className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"
@@ -361,10 +377,14 @@ export default function Contact() {
               </div>
 
               <div>
-                <label className="mb-2 block font-medium text-snrc-blue">
+                <label
+                  htmlFor="contact-message"
+                  className="mb-2 block font-medium text-snrc-blue"
+                >
                   Message
                 </label>
                 <textarea
+                  id="contact-message"
                   rows="5"
                   {...register("message")}
                   className="w-full rounded-xl border border-snrc-blue/15 px-4 py-3 outline-none transition focus:border-snrc-blue"

@@ -1,4 +1,14 @@
+function slugifyId(text) {
+  return String(text || "field")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
 export default function UploadField({
+  id,
   label,
   value,
   onChange,
@@ -7,6 +17,8 @@ export default function UploadField({
   accept = "*",
   placeholder = "",
 }) {
+  const fieldId = id || `upload-field-${slugifyId(label)}`;
+
   async function handleFileChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -17,9 +29,12 @@ export default function UploadField({
 
   return (
     <div className="space-y-3">
-      <label className="block font-medium text-snrc-blue">{label}</label>
+      <label htmlFor={fieldId} className="block font-medium text-snrc-blue">
+        {label}
+      </label>
 
       <input
+        id={fieldId}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}

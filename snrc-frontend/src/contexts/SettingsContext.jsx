@@ -1,7 +1,6 @@
-import { createContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getSettings } from "../api/settingsApi";
-
-export const SettingsContext = createContext(null);
+import { SettingsContext } from "./settingsContextObject";
 
 export function SettingsProvider({ children }) {
   const [settings, setSettings] = useState(null);

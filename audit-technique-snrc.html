@@ -202,6 +202,16 @@
     border-radius: 4px; padding: 1px 5px; margin-right: 6px;
   }
 
+  .skip-box {
+    margin-top: 20px;
+    background: var(--imp-bg);
+    border: 1px solid var(--imp-line);
+    border-radius: 10px;
+    padding: 18px 22px;
+  }
+  .skip-box h3 { color: var(--imp); margin-bottom: 8px; font-size: 15px; }
+  .skip-box p { font-size: 13.5px; color: var(--ink); margin: 0; }
+
   .methodo {
     margin-top: 48px;
     font-size: 12.5px;
@@ -222,86 +232,48 @@
 <body>
 <div class="masthead">
   <div class="masthead-inner">
-    <p class="eyebrow">SNRC · Tchad — Audit technique du site institutionnel — Bilan de la passe de correctifs</p>
-    <h1>Plus aucun point important ou critique — 5 points mineurs restent</h1>
-    <p class="lede">Quatrième passe le 30 août 2026 : les 3 derniers constats importants (suite de tests, poids des deux images de bannière et de la photo de la Direction Générale) ont été corrigés et revérifiés. Il ne reste que des points mineurs, tous documentés ci-dessous avec la raison exacte pour laquelle ils sont volontairement laissés ouverts.</p>
+    <p class="eyebrow">SNRC · Tchad — Audit technique du site institutionnel — Correctifs "Important"</p>
+    <h1>13 des 14 constats importants corrigés — un seul reste, par choix</h1>
+    <p class="lede">Suite directe de la cinquième lecture d'audit : chaque constat classé "Important" a été traité individuellement, corrigé dans le code, puis revérifié (tests, build, lint, et une inspection manuelle des points les plus sensibles). Une régression a été détectée et corrigée pendant ce travail même — les fichiers de Publications, hébergés dans le même dossier que les CV de candidature, auraient sinon perdu leur accès public en corrigeant l'un et en cassant l'autre.</p>
     <div class="stat-row">
       <div class="stat crit"><div class="num">0</div><div class="lbl">critique</div></div>
-      <div class="stat imp"><div class="num">0</div><div class="lbl">important</div></div>
-      <div class="stat min"><div class="num">5</div><div class="lbl">mineurs restants</div></div>
-      <div class="stat"><div class="num">45</div><div class="lbl">constats corrigés aujourd'hui</div></div>
+      <div class="stat imp"><div class="num">1</div><div class="lbl">important restant</div></div>
+      <div class="stat min"><div class="num">27</div><div class="lbl">mineurs (inchangé)</div></div>
+      <div class="stat"><div class="num">13</div><div class="lbl">constats corrigés</div></div>
     </div>
   </div>
 </div>
 
 <div class="wrap">
 
-  <div class="roadmap">
-    <h2>Ce qui reste à traiter</h2>
-    <p class="section-intro">Plus aucun point critique ni important. Les 5 constats mineurs restants sont soit hors de portée de cette passe (outillage manquant sur cette machine), soit des décisions produit ou des backlogs volontairement traités séparément plutôt qu'en urgence.</p>
-    <div class="roadmap-grid" style="grid-template-columns: 1fr;">
-      <div class="roadmap-col crit" style="border-left:none;">
-        <h4 style="color:var(--min);">Mineur (5)</h4>
-        <ul><li><span class="rm-side">Backend</span> Pas d'outil de migration de schéma versionné (4 fichiers SQL manuels, dont 2 ajoutés aujourd'hui)</li><li><span class="rm-side">Frontend</span> logo-snrc.png alourdi (16→29,7 Ko) — même contrainte d'outillage que les deux images corrigées aujourd'hui, mais pas prioritaire (fichier de 29,7 Ko, déjà léger dans l'absolu)</li><li><span class="rm-side">Frontend</span> Pas de page de détail pour les Publications — décision produit, pas un bug</li><li><span class="rm-side">Frontend</span> Asset orphelin non versionné (public/images/brand/logo-snrc.png) laissé en l'état par précaution</li><li><span class="rm-side">Frontend</span> eslint-plugin-jsx-a11y installé aujourd'hui révèle 58 violations préexistantes (labels de formulaire non associés) — backlog à traiter séparément</li></ul>
-      </div>
-    </div>
+  <div class="skip-box">
+    <h3>Le seul constat important non corrigé — et pourquoi</h3>
+    <p><strong>Vidéos de discours officiels sans sous-titres</strong> (src/pages/public/Home.jsx). Ajouter de vrais sous-titres nécessite une transcription fidèle de ce qui est réellement dit dans chaque vidéo — un travail de contenu, pas de code. Générer des sous-titres inventés ou approximatifs sur des discours officiels d'un ministre et d'une directrice générale serait irresponsable (risque de citation erronée). Ce point reste donc volontairement ouvert : il faut une transcription humaine des deux vidéos, puis un fichier .vtt par vidéo — happy to wire up the <code>&lt;track&gt;</code> element as soon as the transcripts exist.</p>
   </div>
 
   <div class="fixed-box">
-    <h3>Corrigé aujourd'hui, 30 août 2026 <span style="color:var(--ink-faint); font-weight:500; font-size:13px;">— 45 constats fermés en deux passes</span></h3>
-    <p class="section-intro">Chaque correctif a été implémenté puis revérifié sur le code réel (fichier rouvert, comportement relu), pas simplement marqué "fait". Le backend est validé par <code>node --check</code> sur chaque fichier modifié et par une suite de tests automatisés (34 tests, ajoutée aujourd'hui) ; le frontend par un <code>npm run build</code> complet, réussi sans erreur.</p>
+    <h3>Corrigé dans cette passe <span style="color:var(--ink-faint); font-weight:500; font-size:13px;">— 13 constats importants fermés</span></h3>
+    <p class="section-intro">Chaque correctif a été revérifié après coup : relecture du code modifié, `npm test`/`npm run lint`/`npm run build` exécutés, et pour le point le plus délicat (accès aux documents), un test out reproduisant exactement le scénario a été ajouté.</p>
     <ul>
-      <li><span class="fixed-tag">Important</span>Suite de tests automatisés ajoutée (vitest + supertest, 34 tests) : authentification et révocation de session (token_version), la faille d'upload corrigée aujourd'hui, l'upsert atomique de settings — priorisée exactement comme recommandé dans ce rapport.</li>
-      <li><span class="fixed-tag">Important</span>Photo de la Directrice Générale recompressée : 2,04 Mo → 110 Ko, sans perte visible (le fichier était en réalité des données PNG déguisées en <code>.jpg</code>, corrigé en vrai JPEG).</li>
-      <li><span class="fixed-tag">Important</span>Bannières snrc.png/snrc3.png (~600 Ko/542 Ko, mauvais format pour des photos) reconverties en JPEG (snrc.jpg/snrc3.jpg, ~197 Ko/193 Ko) — 13 références mises à jour dans le code, sans perte visible.</li>
-      <li><span class="fixed-tag">Critique</span>Upload de candidature (public, sans authentification) : extension de fichier désormais vérifiée en plus du type déclaré, SVG exclu des images, et <code>/uploads/documents</code> sert tout fichier en <code>Content-Disposition: attachment</code> — l'exécution de script via un CV falsifié n'est plus possible.</li>
-      <li><span class="fixed-tag">Important</span>Politique de mot de passe admin relevée à 10 caractères minimum + lettre et chiffre requis, côté serveur et côté formulaire de création.</li>
-      <li><span class="fixed-tag">Important</span>Révocation de session implémentée : colonne <code>token_version</code> sur les comptes admin, vérifiée en base à chaque requête authentifiée — changer un mot de passe, un rôle ou désactiver un compte invalide immédiatement ses jetons déjà émis.</li>
-      <li><span class="fixed-tag">Important</span>Garde-fou d'entropie sur <code>JWT_SECRET</code> (32 caractères minimum) sans pénaliser <code>DB_PASSWORD</code>, qui reste souvent imposé par l'hébergeur.</li>
-      <li><span class="fixed-tag">Important</span>Rate-limiting ajouté sur les formulaires publics contact et candidature (spam/flood de fichiers).</li>
-      <li><span class="fixed-tag">Mineur</span>Garde-fou empêchant de désactiver ou supprimer le dernier superadministrateur actif.</li>
-      <li><span class="fixed-tag">Mineur</span><code>crossOriginResourcePolicy</code> n'est plus désactivé pour toute l'API, seulement pour <code>/uploads</code>.</li>
-      <li><span class="fixed-tag">Mineur</span>Variable d'environnement <code>COOKIE_SECRET</code> morte retirée du <code>.env</code> local.</li>
-      <li><span class="fixed-tag">Important</span><code>pg.Pool</code> a désormais un gestionnaire d'erreur — une coupure DB ne fait plus planter le process.</li>
-      <li><span class="fixed-tag">Important</span>Race condition sur <code>settings</code> éliminée par un upsert atomique protégé par un index unique.</li>
-      <li><span class="fixed-tag">Important</span><code>morgan</code> monté : les requêtes HTTP sont maintenant journalisées.</li>
-      <li><span class="fixed-tag">Mineur</span><code>server.js</code> utilise désormais le module <code>env</code> centralisé au lieu de lire <code>process.env.PORT</code> directement.</li>
-      <li><span class="fixed-tag">Mineur</span>Plafond du corps JSON/urlencoded aligné à 2 Mo (cohérent avec la limite d'upload de 5 Mo).</li>
-      <li><span class="fixed-tag">Mineur</span>Le paramètre <code>limit</code> des listes publiques est désormais borné (1-100) et validé.</li>
-      <li><span class="fixed-tag">Mineur</span>Index ajoutés sur les colonnes de jointure/filtrage fréquentes (candidatures, actualités, publications, messages).</li>
-      <li><span class="fixed-tag">Mineur</span>Endpoint public <code>GET /services/:slug</code> ajouté, cohérent avec les autres ressources.</li>
-      <li><span class="fixed-tag">Mineur</span>Messages d'erreur d'authentification traduits en français.</li>
-      <li><span class="fixed-tag">Mineur</span>Lettre de motivation des candidatures plafonnée à 5000 caractères.</li>
-      <li><span class="fixed-tag">Important</span>Séparation de rôles ajoutée au routing frontend : /admin/administrateurs et /admin/parametres réservés au superadmin.</li>
-      <li><span class="fixed-tag">Mineur</span>Logs de debug (erreurs API) désormais masqués en production.</li>
-      <li><span class="fixed-tag">Mineur</span>Contrainte de robustesse ajoutée sur le mot de passe à la création d'un admin (formulaire).</li>
-      <li><span class="fixed-tag">Important</span><code>&lt;html lang="fr"&gt;</code> corrigé (était "en").</li>
-      <li><span class="fixed-tag">Important</span>Balises Open Graph/Twitter/canonical complétées par défaut sur toutes les pages.</li>
-      <li><span class="fixed-tag">Important</span>/carrieres ajouté au sitemap.xml.</li>
-      <li><span class="fixed-tag">Mineur</span>Double h1 corrigé sur les pages actualité et offre d'emploi.</li>
-      <li><span class="fixed-tag">Mineur</span>Page 404 dotée de métadonnées et d'un <code>noindex</code>.</li>
-      <li><span class="fixed-tag">Important</span>Menu mobile : aria-expanded/aria-controls, fermeture Échap, gestion du focus à l'ouverture/fermeture.</li>
-      <li><span class="fixed-tag">Important</span>Lightbox galerie/actualités : sémantique de dialogue modale (role, aria-modal, gestion du focus).</li>
-      <li><span class="fixed-tag">Mineur</span>eslint-plugin-jsx-a11y installé et activé dans la configuration ESLint (voir backlog révélé ci-contre).</li>
-      <li><span class="fixed-tag">Mineur</span>Boutons de la barre d'outils de l'éditeur riche dotés d'aria-pressed reflétant l'état actif.</li>
-      <li><span class="fixed-tag">Mineur</span>Règle <code>prefers-reduced-motion</code> ajoutée, y compris pour la bande d'actualités défilante.</li>
-      <li><span class="fixed-tag">Mineur</span>Appel <code>/settings</code> mutualisé via un contexte partagé (Header + Footer) au lieu de deux requêtes indépendantes.</li>
-      <li><span class="fixed-tag">Mineur</span>Vérification de session (<code>/auth/me</code>) limitée aux pages sous /admin.</li>
-      <li><span class="fixed-tag">Important</span>Formulaire de contact réécrit avec react-hook-form + zod : validation réelle, dépendances jusqu'ici inutilisées enfin câblées.</li>
-      <li><span class="fixed-tag">Important</span>FAQ : le contenu du CMS prime désormais sur les questions codées en dur en cas de libellé identique.</li>
-      <li><span class="fixed-tag">Mineur</span>Utilitaires <code>resolveMediaUrl</code>/<code>formatDate</code> mutualisés (Accueil + détail actualité).</li>
-      <li><span class="fixed-tag">Mineur</span>Repli du logo en pied de page corrigé (pointait vers lui-même, donc inopérant).</li>
-      <li><span class="fixed-tag">Mineur</span>Fichier mort <code>src/App.css</code> (scaffolding Vite jamais importé) supprimé.</li>
-      <li><span class="fixed-tag">Mineur</span>Redirection automatique vers /admin/login ajoutée sur une session admin expirée (401).</li>
-      <li><span class="fixed-tag">Mineur</span>Image morte <code>snrc1.png</code> (~605 Ko, non référencée) supprimée.</li>
-      <li><span class="fixed-tag">Mineur</span>Échec silencieux de <code>getNews()</code> désormais signalé en console (dev).</li>
-      <li><span class="fixed-tag">Important</span>Les 2 slides du carrousel hero aux images introuvables ont été retirées plutôt que de continuer à afficher un fond vide.</li>
+      <li><span class="fixed-tag">Backend</span>Désactiver un compte <code>admin_editeur</code> révoque désormais bien sa session (le correctif précédent ne couvrait que les superadmins).</li>
+      <li><span class="fixed-tag">Backend</span>CV et lettres de motivation protégés par authentification — <strong>avec une exception vérifiée en base</strong> pour ne pas casser l'accès public aux fichiers de Publications, qui partageaient le même dossier physique.</li>
+      <li><span class="fixed-tag">Backend</span>La FAQ passe désormais par la même sanitisation HTML serveur que tous les autres contenus riches.</li>
+      <li><span class="fixed-tag">Backend</span>Les fichiers uploadés sont vérifiés sur leur contenu réel (signature binaire via <code>file-type</code>), pas seulement sur le type/extension déclarés par le client.</li>
+      <li><span class="fixed-tag">Backend</span><code>schema.sql</code> est maintenant complet à lui seul pour une installation fraîche (colonne <code>token_version</code>, index inclus) ; le README distingue installation neuve et mise à niveau.</li>
+      <li><span class="fixed-tag">Frontend</span>Les liens "Administrateurs"/"Paramètres" ne s'affichent plus dans le menu pour un compte qui n'a pas le droit d'y accéder.</li>
+      <li><span class="fixed-tag">Frontend</span>Le titre et les meta d'une actualité/offre ne restent plus figés sur la page précédente pendant le chargement — le hook `usePageMeta` n'est plus appelé conditionnellement.</li>
+      <li><span class="fixed-tag">Frontend</span><code>sitemap.xml</code> est désormais généré à chaque build à partir du contenu réellement publié (actualités, offres), au lieu d'une liste statique de 9 pages.</li>
+      <li><span class="fixed-tag">Frontend</span>~55 champs de formulaire dotés d'un label correctement associé — 0 violation <code>jsx-a11y/label-has-associated-control</code> restante (contre 57).</li>
+      <li><span class="fixed-tag">Frontend</span>Toutes les animations framer-motion respectent désormais <code>prefers-reduced-motion</code> (un seul point de câblage, <code>MotionConfig</code>).</li>
+      <li><span class="fixed-tag">Frontend</span>Les deux vraies violations <code>react-hooks/set-state-in-effect</code> corrigées au passage (lint : 92 → 29 erreurs).</li>
+      <li><span class="fixed-tag">Frontend</span>~4 Mo d'images orphelines et dupliquées supprimées (dossier hero/ entier, doublons actualités/publications).</li>
+      <li><span class="fixed-tag">Frontend</span>Backlog restant du lint (29 erreurs) passé en revue : uniquement du hors-scope déjà connu — 2 faux positifs de configuration, 1 code mort mineur, et l'absence de sous-titres vidéo ci-dessus.</li>
     </ul>
   </div>
 
   <div class="positives">
-    <h3>Ce qui est déjà solide</h3>
-    <ul><li>Toutes les requêtes SQL du backend restent paramétrées — aucune injection SQL détectée, à nouveau vérifié.</li><li>Le token de session n'est toujours jamais stocké en localStorage/sessionStorage côté frontend.</li><li>Le circuit CSRF (cookie + header + vérification stricte) reste vérifié de bout en bout.</li><li>La révocation de session par <code>token_version</code>, ajoutée aujourd'hui, ferme un point resté ouvert depuis le tout premier audit.</li><li>Le point le plus exposé du site — l'upload public non authentifié — n'accepte plus que des fichiers dont l'extension correspond réellement au type déclaré, et sert tout document en téléchargement forcé plutôt qu'en rendu direct.</li><li>Le module Recrutement (offres + candidatures + back-office) reste complet et fonctionnel de bout en bout.</li><li>L'accordéon FAQ public et, depuis aujourd'hui, le menu mobile et la lightbox galerie gèrent tous correctement le clavier et les attributs ARIA.</li><li>34 tests automatisés couvrent désormais l'authentification, la révocation de session et l'upload de fichiers — notamment un test qui reproduit exactement l'exploit corrigé aujourd'hui (CV envoyé en <code>.html</code> avec un <code>Content-Type</code> falsifié en <code>application/pdf</code>) et vérifie qu'il est bien rejeté.</li></ul>
+    <h3>Ce qui reste solide, revérifié une nouvelle fois</h3>
+    <ul><li>Aucune injection SQL sur l'ensemble du backend.</li><li>34 → 57 tests automatisés (23 ajoutés pendant cette passe), tous passants, couvrant maintenant explicitement l'exploit corrigé sur l'upload de fichiers et la nouvelle règle de révocation de session.</li><li>La régression sur les Publications a été détectée avant la mise en production, pas après — le correctif initial livré par l'agent en charge du backend documentait honnêtement le conflit plutôt que de le masquer, ce qui a permis de le corriger tout de suite.</li></ul>
   </div>
 
   <section class="side-section" id="backend">
@@ -310,22 +282,191 @@
       <div class="side-head-counts">
         <span class="sev-chip sev-crit">0</span>
         <span class="sev-chip sev-imp">0</span>
-        <span class="sev-chip sev-min">1</span>
+        <span class="sev-chip sev-min">14</span>
       </div>
     </div>
+    <p class="section-intro">Les 5 constats "Important" du backend sont tous corrigés (voir encart ci-dessus). Seuls les 14 constats mineurs de la dernière lecture restent ouverts, inchangés — non traités dans cette passe, qui ciblait spécifiquement les constats importants.</p>
 
     <div class="subsection">
-      <h3>Architecture <span class="count">1</span></h3>
+      <h3>Sécurité <span class="count">3</span></h3>
       <div class="finding-list">
   <details class="finding sev-min">
     <summary>
       <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Pas d'outil de migration versionné</span>
+      <span class="finding-title">Énumération d'emails admin possible par mesure du temps de réponse au login</span>
     </summary>
     <div class="finding-body">
-      <div class="finding-ref">sql/schema.sql, sql/migration_recrutement.sql, sql/migration_token_version.sql, sql/migration_indexes.sql</div>
-      <p class="finding-desc">Deux nouveaux fichiers de migration manuels (<code>migration_token_version.sql</code>, <code>migration_indexes.sql</code>) ont été ajoutés aujourd'hui pour livrer les correctifs — ils doivent être appliqués manuellement en production avant que le code déployé ne fonctionne correctement (le champ <code>token_version</code> et l'index singleton sur <code>settings</code> sont requis par le nouveau code). Le sujet de fond — l'absence d'outil de suivi de version de schéma — reste entier et devient plus pressant à mesure que le nombre de fichiers SQL manuels augmente.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Exécuter <code>sql/migration_token_version.sql</code> et <code>sql/migration_indexes.sql</code> sur la base de production dès que possible (le nouveau code backend en dépend). À moyen terme, adopter un outil de migration (node-pg-migrate, Knex, Prisma...).</p>
+      <div class="finding-ref">src/controllers/auth.controller.js:24-43</div>
+      <p class="finding-desc"><code>login()</code> renvoie 401 immédiatement si l'email est inconnu, mais exécute un <code>bcrypt.compare</code> coûteux si l'email existe — la différence de temps de réponse permet de déterminer si un email correspond à un compte admin existant.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Exécuter un <code>bcrypt.compare</code> factice sur le chemin "utilisateur introuvable".</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Aucune protection contre le brute-force distribué (uniquement par IP)</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/middlewares/rateLimiters.js:3-12</div>
+      <p class="finding-desc">Un attaquant répartissant ses tentatives sur plusieurs IP n'est pas ralenti pour cibler un compte précis.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter un compteur d'échecs par compte (email) en complément du rate-limit par IP.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Attribut style autorisé sans restriction sur tout le HTML riche admin</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/middlewares/sanitizeHtmlFields.js:5-14</div>
+      <p class="finding-desc">Un contenu admin peut injecter du CSS arbitraire sans exécuter de script, avec un risque de défiguration/spoofing visuel si un compte éditeur est compromis.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Restreindre <code>style</code> à une liste blanche de propriétés via <code>allowedStyles</code>.</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Architecture <span class="count">5</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Race condition (TOCTOU) sur le garde-fou "dernier superadmin actif"</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/controllers/adminUsers.controller.js:41-49,79-86</div>
+      <p class="finding-desc">Le contrôle exécute un SELECT COUNT(*) séparé de l'UPDATE/DELETE, sans transaction ni verrou.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Encapsuler la vérification et l'action dans une transaction avec <code>SELECT ... FOR UPDATE</code>.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Aucune pagination sur les listes admin</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/models/news.model.js, jobApplications.model.js, messages.model.js, adminUsers.model.js</div>
+      <p class="finding-desc">Tous les endpoints /admin/* renvoient la table entière en une seule réponse.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter une pagination limit/offset sur tous les listings admin.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Pas de filet de sécurité au niveau du process</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/server.js</div>
+      <p class="finding-desc">Aucun handler unhandledRejection/uncaughtException, aucun arrêt propre du pool PG/serveur HTTP sur SIGTERM.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter ces handlers.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Duplication de la logique de parsing d'ALLOWED_ORIGINS</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/config/cors.js:10-16, src/config/env.js:32-35</div>
+      <p class="finding-desc">cors.js reparse la variable indépendamment au lieu de réutiliser <code>env.ALLOWED_ORIGINS</code> déjà calculé.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Faire importer <code>env.ALLOWED_ORIGINS</code> par cors.js.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Erreurs 500 génériques pour des erreurs client attendues</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/middlewares/errorHandler.js, src/middlewares/upload.js:38</div>
+      <p class="finding-desc">L'erreur de fileFilter n'a pas de <code>.status</code>, donc errorHandler renvoie un 500 pour un simple mauvais type de fichier.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Fixer <code>.status = 400</code> et ajouter un middleware dédié aux erreurs Multer.</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Fonctionnel <span class="count">3</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">La date limite d'une offre d'emploi n'est pas vérifiée à la candidature</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/models/jobs.model.js, src/controllers/jobApplications.controller.js:6-12</div>
+      <p class="finding-desc">Un candidat avec le lien direct d'une offre expirée mais toujours "published" peut candidater après la date limite affichée.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Vérifier également <code>application_deadline</code> dans findBySlug et avant d'accepter une candidature.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Vocabulaire de statut incohérent entre fonctionnalités similaires</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/models/messages.model.js:20-24, jobApplications.model.js:35-41</div>
+      <p class="finding-desc">"read"/"new" (anglais) côté messages contre "lu"/"nouveau" (français) côté candidatures, fonctionnellement identique.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Uniformiser le vocabulaire des statuts entre les deux modules.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Un changement de rôle ne prend effet qu'au prochain refresh/login</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/middlewares/requireAuth.js:5-38</div>
+      <p class="finding-desc">Promouvoir/rétrograder un utilisateur ne change pas ses droits effectifs tant que son token n'a pas été renouvelé.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Documenter ce comportement ou faire incrémenter token_version à chaque changement de rôle.</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Dette technique <span class="count">3</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Table media créée mais jamais utilisée</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">sql/schema.sql:130-140</div>
+      <p class="finding-desc">Chaque type de contenu stocke ses chemins de fichiers directement dans ses propres colonnes, sans passer par cette table.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Supprimer la table du schéma ou l'intégrer réellement au suivi des uploads.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Aucune CI n'exécute la suite de tests</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">package.json (aucun workflow CI trouvé)</div>
+      <p class="finding-desc">Le filet de sécurité (désormais 57 tests) dépend entièrement de l'exécution manuelle avant déploiement.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter un pipeline CI (GitHub Actions) exécutant <code>npm test</code> à chaque push/PR.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Pas de bornes de longueur sur plusieurs champs publics, pas de validateur sur /admin/settings</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/validators/message.validator.js:3-8, src/routes/settings.routes.js:8</div>
+      <p class="finding-desc"><code>PUT /admin/settings</code> n'a aucun middleware de validation, req.body allant directement dans SettingsModel.update.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter des bornes isLength({max}) explicites et un validateur pour /admin/settings.</p>
     </div>
   </details></div>
     </div>
@@ -336,89 +477,242 @@
       <h2>Frontend — React &amp; expérience publique</h2>
       <div class="side-head-counts">
         <span class="sev-chip sev-crit">0</span>
-        <span class="sev-chip sev-imp">0</span>
-        <span class="sev-chip sev-min">4</span>
+        <span class="sev-chip sev-imp">1</span>
+        <span class="sev-chip sev-min">13</span>
       </div>
+    </div>
+    <p class="section-intro">8 des 9 constats "Important" du frontend sont corrigés (voir encart ci-dessus). Le seul restant — l'absence de sous-titres vidéo — est expliqué dans l'encart dédié en haut de page. Les 13 constats mineurs sont inchangés.</p>
+
+    <div class="subsection">
+      <h3>Sécurité <span class="count">1</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Un log d'erreur échappe au garde-fou "production"</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/Home.jsx:438</div>
+      <p class="finding-desc"><code>console.warn(...)</code> sur l'échec de getNews() s'exécute sans condition d'environnement, contrairement aux autres points de journalisation du projet.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Aligner ce log sur le garde <code>import.meta.env.DEV</code>.</p>
+    </div>
+  </details></div>
     </div>
 
     <div class="subsection">
-      <h3>Accessibilité <span class="count">2</span></h3>
+      <h3>SEO <span class="count">1</span></h3>
       <div class="finding-list">
-  <details class="finding sev-min" open>
+  <details class="finding sev-min">
     <summary>
       <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Nouveau — eslint-plugin-jsx-a11y révèle 58 violations préexistantes</span>
+      <span class="finding-title">Polices personnalisées déclarées mais jamais chargées</span>
     </summary>
     <div class="finding-body">
-      <div class="finding-ref">eslint.config.js (plugin installé et activé aujourd'hui)</div>
-      <p class="finding-desc">L'installation du linter d'accessibilité (corrective de cette passe) a immédiatement révélé un backlog qui existait déjà, invisible faute d'outillage : 57 occurrences de <code>jsx-a11y/label-has-associated-control</code> réparties sur une dizaine de pages d'administration, <code>Contact.jsx</code> et <code>JobDetail.jsx</code> (labels de formulaire non liés via <code>htmlFor</code>/<code>id</code>), et 1 occurrence de <code>jsx-a11y/media-has-caption</code> sur la balise <code>&lt;video&gt;</code> de la lightbox d'accueil. Volume trop important pour un correctif ponctuel dans cette passe.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Traiter par lot lors des prochaines modifications de chaque page concernée plutôt qu'en un seul gros commit ; le linter empêchera désormais toute nouvelle régression.</p>
+      <div class="finding-ref">src/index.css:11-12, index.html</div>
+      <p class="finding-desc">Inter/Montserrat sont définies dans le thème Tailwind, mais aucun chargement réel n'existe — le site retombe silencieusement sur la pile de secours partout.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Charger réellement ces polices, ou retirer leurs noms de la pile.</p>
+    </div>
+  </details></div>
+    </div>
+
+    <div class="subsection">
+      <h3>Accessibilité <span class="count">3</span></h3>
+      <div class="finding-list">
+  <details class="finding sev-imp" open>
+    <summary>
+      <span class="sev-chip sev-imp">Important</span>
+      <span class="finding-title">Vidéos de discours officiels sans sous-titres — volontairement non corrigé</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/Home.jsx:377-383</div>
+      <p class="finding-desc">La balise <code>&lt;video&gt;</code> de la lightbox ne comporte aucun élément <code>&lt;track&gt;</code>. Voir l'encart dédié en haut de page : ce point nécessite une transcription humaine du contenu réellement prononcé, qui ne peut pas être fabriquée automatiquement pour des discours officiels sans risque d'erreur de citation.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Faire transcrire les deux discours, puis fournir un fichier .vtt par vidéo.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Retours de formulaire non annoncés aux lecteurs d'écran</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">Contact.jsx:380-382, JobDetail.jsx:293-295</div>
+      <p class="finding-desc">Le message de succès/erreur après soumission est un simple <code>&lt;p&gt;</code> sans <code>aria-live</code>.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter <code>aria-live="polite"</code> sur le conteneur de feedback.</p>
     </div>
   </details>
 
   <details class="finding sev-ok">
     <summary>
       <span class="sev-chip sev-ok">Point positif</span>
-      <span class="finding-title">Menu mobile et lightbox galerie désormais accessibles au clavier</span>
+      <span class="finding-title">Menu mobile, lightbox et accordéon FAQ : gestion clavier/ARIA correcte</span>
     </summary>
     <div class="finding-body">
-      <div class="finding-ref">src/components/layout/Header.jsx, src/pages/public/Home.jsx (GalleryLightbox)</div>
-      <p class="finding-desc">Vérifié aujourd'hui : aria-expanded/aria-controls sur le bouton hamburger, fermeture Échap et restitution du focus des deux côtés, role="dialog"/aria-modal sur la lightbox. Rejoint l'accordéon FAQ comme bon exemple du site.</p>
+      <div class="finding-ref">Header.jsx, Home.jsx, FAQ.jsx</div>
+      <p class="finding-desc">Les trois éléments interactifs vérifiés en détail ont une implémentation correcte, et tous les formulaires ont désormais des labels correctement associés.</p>
 
     </div>
   </details></div>
     </div>
 
     <div class="subsection">
-      <h3>Performance <span class="count">1</span></h3>
+      <h3>Performance <span class="count">4</span></h3>
       <div class="finding-list">
   <details class="finding sev-min">
     <summary>
       <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">logo-snrc.png légèrement alourdi (16 Ko → 29,7 Ko)</span>
+      <span class="finding-title">Image de repli de 241 Ko affichée dans une vignette de 80×96 px</span>
     </summary>
     <div class="finding-body">
-      <div class="finding-ref">public/images/logo-snrc.png</div>
-      <p class="finding-desc">Contrairement aux deux autres images corrigées aujourd'hui (dg-snrc.jpg, snrc.jpg/snrc3.jpg), celle-ci reste un PNG légèrement plus lourd qu'avant. Non traité par manque de priorité réelle : 29,7 Ko est déjà un poids négligeable pour un logo affiché à ~72px de haut.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Utiliser un SVG pour le logo plutôt qu'un PNG, à l'occasion d'un prochain passage sur la charte graphique.</p>
+      <div class="finding-ref">src/pages/public/Publications.jsx:199-208</div>
+      <p class="finding-desc">Poids disproportionné pour la taille d'affichage réelle du repli quand item.cover_image est absent.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Recompresser/redimensionner ce repli à la taille réellement affichée.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Le carrousel hero force des re-renders inutiles en continu</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/Home.jsx (heroSlides à 1 seule entrée + setInterval)</div>
+      <p class="finding-desc">Avec un seul slide, l'intervalle de rotation force un re-render complet de l'arbre Home en continu sans aucun changement visuel.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Retirer l'intervalle tant qu'il n'y a qu'un seul slide.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">PDF de 10,8 Mo lié depuis la page FAQ</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">public/documents/decret-0539-statuts-snrc.pdf</div>
+      <p class="finding-desc">Document juridique lourd pour une consultation mobile, probablement un scan non optimisé.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Compresser le PDF.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-ok">
+    <summary>
+      <span class="sev-chip sev-ok">Point positif</span>
+      <span class="finding-title">Découpage du bundle correct, ~4 Mo d'images mortes en moins</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">sortie de npm run build</div>
+      <p class="finding-desc">Le routage par React.lazy produit des chunks raisonnables ; le dossier hero/ entier et les doublons actualités/publications, jamais utilisés, ont été supprimés dans cette passe.</p>
+
     </div>
   </details></div>
     </div>
 
     <div class="subsection">
-      <h3>Qualité de code <span class="count">1</span></h3>
+      <h3>Qualité de code <span class="count">6</span></h3>
       <div class="finding-list">
   <details class="finding sev-min">
     <summary>
       <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Asset orphelin non versionné laissé en l'état</span>
+      <span class="finding-title">Code mort réel noyé dans un faux positif du linter</span>
     </summary>
     <div class="finding-body">
-      <div class="finding-ref">public/images/brand/logo-snrc.png (non suivi par git)</div>
-      <p class="finding-desc">Volontairement laissé de côté dans cette passe : ce fichier a été ajouté récemment par quelqu'un et pourrait être un travail en cours plutôt qu'un déchet — le supprimer sans confirmation aurait été risqué.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Confirmer s'il doit être committé avec un usage réel, ou supprimé.</p>
+      <div class="finding-ref">src/pages/public/Home.jsx:189-205 (governanceItems), eslint.config.js</div>
+      <p class="finding-desc">Sans eslint-plugin-react, no-unused-vars signale à tort <code>motion</code> comme inutilisé, masquant un vrai code mort juste à côté : governanceItems n'est jamais rendu.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter eslint-plugin-react, puis utiliser ou supprimer governanceItems.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Composant Container dupliqué en local plutôt qu'importé</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/pages/public/Home.jsx:32-41 vs src/components/ui/Container.jsx</div>
+      <p class="finding-desc">Home.jsx redéfinit son propre Container avec un commentaire indiquant un contournement d'alias d'import non résolu.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Importer components/ui/Container.jsx comme partout ailleurs.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Dépendance clsx déclarée mais jamais utilisée</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">package.json</div>
+      <p class="finding-desc">Aucun import dans src/, alors que les concaténations de classes conditionnelles sont faites en template strings partout.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Retirer la dépendance ou l'utiliser.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">Fichiers de scaffolding Vite jamais nettoyés</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/assets/hero.png, react.svg, vite.svg</div>
+      <p class="finding-desc">Aucun de ces trois fichiers n'est importé nulle part dans src/.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Supprimer src/assets/ ou son contenu inutilisé.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">router.jsx mélange composant et export non-composant (Fast Refresh cassé en dev)</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/app/router.jsx</div>
+      <p class="finding-desc">Contrairement à AuthContext.jsx et SettingsContext.jsx (corrigés dans cette passe), router.jsx exporte encore l'objet <code>router</code> aux côtés de composants lazy-loadés — sans impact en production, seulement en développement (pas de Fast Refresh sur ce fichier).</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Laisser en l'état sauf gêne réelle en développement — le découpage n'apporterait qu'un bénéfice marginal ici.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-ok">
+    <summary>
+      <span class="sev-chip sev-ok">Point positif</span>
+      <span class="finding-title">Lint : 92 → 29 erreurs, SettingsContext centralisé</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">SettingsContext.jsx, useSettings.js</div>
+      <p class="finding-desc">Header, Footer et Contact consomment le même contexte au lieu de dupliquer l'appel réseau. Le linter d'accessibilité, quasi silencieux il y a peu, ne remonte plus que du bruit connu et documenté.</p>
+
     </div>
   </details></div>
     </div>
 
     <div class="subsection">
-      <h3>Fonctionnel <span class="count">1</span></h3>
+      <h3>Fonctionnel <span class="count">2</span></h3>
       <div class="finding-list">
   <details class="finding sev-min">
     <summary>
       <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Pas de page de détail pour les Publications</span>
+      <span class="finding-title">Texte d'instruction développeur visible par les utilisateurs finaux en cas d'échec image</span>
     </summary>
     <div class="finding-body">
-      <div class="finding-ref">src/pages/public/Publications.jsx</div>
-      <p class="finding-desc">Contrairement à Actualités et Carrières, les Publications n'ont toujours pas de route /publications/:slug. Décision produit plutôt qu'un bug — volontairement non traité dans cette passe de correctifs.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Évaluer si une fiche publication apporterait de la valeur SEO/partage, sinon documenter ce choix comme intentionnel.</p>
+      <div class="finding-ref">src/pages/public/Home.jsx:1036-1048</div>
+      <p class="finding-desc">Si l'image de la Directrice Générale échoue à charger, le repli affiche un message destiné à un développeur, resté dans le code de production.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Remplacer par un message neutre pour l'utilisateur final.</p>
+    </div>
+  </details>
+
+  <details class="finding sev-min">
+    <summary>
+      <span class="sev-chip sev-min">Mineur</span>
+      <span class="finding-title">En-tête admin figé sur "Tableau de bord" sur toutes les pages</span>
+    </summary>
+    <div class="finding-body">
+      <div class="finding-ref">src/components/layout/AdminLayout.jsx:110-112</div>
+      <p class="finding-desc">Le titre affiché dans l'en-tête de la coquille admin est codé en dur et ne change jamais selon la page visitée.</p>
+      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Dériver ce titre de la route active, ou le supprimer.</p>
     </div>
   </details></div>
     </div>
   </section>
 
-  <p class="methodo">Méthodologie : deux passes de correction le 30 août 2026, le jour même de la deuxième lecture d'audit — une première fermant 42 constats, une seconde fermant les 3 derniers points importants (suite de tests, poids des images). Chaque correctif a été revérifié par une relecture indépendante du code modifié plutôt qu'accepté sur la base du rapport d'exécution — le fichier <code>env.js</code> a par exemple été ajusté après coup (le seuil de 32 caractères ne devait s'appliquer qu'au JWT_SECRET généré par l'application, pas au mot de passe de base de données souvent imposé par l'hébergeur, qui aurait sinon empêché le serveur de démarrer), et la recompression des images a été vérifiée visuellement en plus de la mesure du poids des fichiers. Backend validé par <code>node --check</code> sur chaque fichier modifié et par une suite de 34 tests automatisés (<code>npm test</code>, tous passants) ; frontend validé par un <code>npm run build</code> complet réussi sans erreur. <strong>Action requise avant le prochain déploiement :</strong> exécuter <code>sql/migration_token_version.sql</code> et <code>sql/migration_indexes.sql</code> sur la base de données de production — le nouveau code backend (révocation de session, upsert settings) en dépend.</p>
+  <p class="methodo">Méthodologie : passe de correction ciblée sur les 14 constats "Important" de la lecture du 31 août 2026, menée par deux équipes de travail séparées (backend / frontend) travaillant à partir de chaque constat vérifié individuellement. Un conflit non anticipé (documents de Publications vs candidatures partageant un même dossier) a été détecté par l'équipe backend elle-même pendant l'implémentation, signalé clairement plutôt que masqué, puis corrigé séparément par vérification en base de données avant intégration. Chaque correctif a ensuite été revérifié indépendamment : relecture du code modifié, `npm test` (57/57), `npm run build`, `npm run lint`, et une vérification empirique du sitemap généré contre le contenu réellement publié en production. Les 27 constats mineurs de la lecture précédente n'ont pas été touchés dans cette passe et restent listés ci-dessus pour référence.</p>
 </div>
 
 </body>

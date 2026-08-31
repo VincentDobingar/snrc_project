@@ -1,5 +1,7 @@
 import { ok } from "../utils/apiResponse.js";
 import { env } from "../config/env.js";
+import { IMAGE_MIME_TYPES, DOCUMENT_MIME_TYPES } from "../middlewares/upload.js";
+import { verifyUploadedFilesContent } from "../middlewares/verifyFileContent.js";
 
 function buildPublicUrl(relativePath) {
   const baseUrl = (env.API_URL || "").replace(/\/+$/, "");
@@ -10,6 +12,13 @@ export const UploadController = {
   async uploadImage(req, res, next) {
     if (!req.file) {
       const error = new Error("Aucun fichier image reçu");
+      error.status = 400;
+      return next(error);
+    }
+
+    const isValid = await verifyUploadedFilesContent([req.file], IMAGE_MIME_TYPES);
+    if (!isValid) {
+      const error = new Error("Le contenu du fichier ne correspond pas à un type d'image autorisé");
       error.status = 400;
       return next(error);
     }
@@ -34,6 +43,13 @@ export const UploadController = {
   async uploadDocument(req, res, next) {
     if (!req.file) {
       const error = new Error("Aucun document reçu");
+      error.status = 400;
+      return next(error);
+    }
+
+    const isValid = await verifyUploadedFilesContent([req.file], DOCUMENT_MIME_TYPES);
+    if (!isValid) {
+      const error = new Error("Le contenu du fichier ne correspond pas à un type de document autorisé");
       error.status = 400;
       return next(error);
     }

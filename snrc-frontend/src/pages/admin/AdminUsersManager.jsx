@@ -196,10 +196,14 @@ export default function AdminUsersManager() {
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="admin-user-full_name"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Nom complet
             </label>
             <input
+              id="admin-user-full_name"
               type="text"
               name="full_name"
               value={form.full_name}
@@ -210,10 +214,14 @@ export default function AdminUsersManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="admin-user-email"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Email
             </label>
             <input
+              id="admin-user-email"
               type="email"
               name="email"
               value={form.email}
@@ -224,10 +232,14 @@ export default function AdminUsersManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="admin-user-role"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Rôle
             </label>
             <select
+              id="admin-user-role"
               name="role"
               value={form.role}
               onChange={handleChange}
@@ -239,10 +251,14 @@ export default function AdminUsersManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="admin-user-status"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Statut
             </label>
             <select
+              id="admin-user-status"
               name="status"
               value={form.status}
               onChange={handleChange}
@@ -255,10 +271,14 @@ export default function AdminUsersManager() {
 
           {!editingId ? (
             <div className="md:col-span-2">
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="admin-user-password"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Mot de passe initial
               </label>
               <input
+                id="admin-user-password"
                 type="password"
                 name="password"
                 value={form.password}

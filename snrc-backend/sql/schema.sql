@@ -11,6 +11,10 @@ CREATE TABLE IF NOT EXISTS admins (
     password_hash TEXT NOT NULL,
     role VARCHAR(30) NOT NULL DEFAULT 'admin_editeur',
     status VARCHAR(20) NOT NULL DEFAULT 'active',
+    -- Compteur de version de jeton : permet de révoquer immédiatement tous les
+    -- JWT déjà émis pour ce compte (changement de mot de passe, désactivation,
+    -- changement de rôle) sans attendre leur expiration naturelle.
+    token_version INTEGER NOT NULL DEFAULT 0,
     last_login_at TIMESTAMP NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -127,6 +131,10 @@ CREATE TABLE IF NOT EXISTS settings (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Garantit qu'il ne peut jamais exister plus d'une ligne dans settings, même en
+-- cas d'écritures concurrentes lors de la toute première initialisation.
+CREATE UNIQUE INDEX IF NOT EXISTS settings_singleton_idx ON settings ((true));
+
 CREATE TABLE IF NOT EXISTS media (
     id SERIAL PRIMARY KEY,
     file_name VARCHAR(255) NOT NULL,
@@ -175,6 +183,17 @@ CREATE TABLE IF NOT EXISTS job_applications (
 -- Sécurité si la table existait déjà sans ce champ
 ALTER TABLE settings
 ADD COLUMN IF NOT EXISTS contact_phone_secondary VARCHAR(50);
+
+-- =========================
+-- INDEX
+-- =========================
+
+CREATE INDEX IF NOT EXISTS idx_job_applications_job_offer_id ON job_applications(job_offer_id);
+CREATE INDEX IF NOT EXISTS idx_news_status ON news(status);
+CREATE INDEX IF NOT EXISTS idx_news_published_at ON news(published_at);
+CREATE INDEX IF NOT EXISTS idx_publications_category_id ON publications(category_id);
+CREATE INDEX IF NOT EXISTS idx_messages_is_read ON messages(is_read);
+CREATE INDEX IF NOT EXISTS idx_messages_status ON messages(status);
 
 -- =========================
 -- SEED SETTINGS

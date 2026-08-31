@@ -175,10 +175,14 @@ export default function SettingsManager() {
 
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-site_name"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Nom du site
               </label>
               <input
+                id="settings-site_name"
                 type="text"
                 name="site_name"
                 value={form.site_name}
@@ -189,10 +193,14 @@ export default function SettingsManager() {
             </div>
 
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-site_tagline"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Slogan / sous-titre
               </label>
               <input
+                id="settings-site_tagline"
                 type="text"
                 name="site_tagline"
                 value={form.site_tagline}
@@ -203,10 +211,14 @@ export default function SettingsManager() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-site_description"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Description du site
               </label>
               <textarea
+                id="settings-site_description"
                 rows="5"
                 name="site_description"
                 value={form.site_description}
@@ -225,10 +237,14 @@ export default function SettingsManager() {
 
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-contact_email"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Email de contact
               </label>
               <input
+                id="settings-contact_email"
                 type="email"
                 name="contact_email"
                 value={form.contact_email}
@@ -239,10 +255,14 @@ export default function SettingsManager() {
             </div>
 
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-contact_phone"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Téléphone principal
               </label>
               <input
+                id="settings-contact_phone"
                 type="text"
                 name="contact_phone"
                 value={form.contact_phone}
@@ -253,10 +273,14 @@ export default function SettingsManager() {
             </div>
 
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-contact_phone_secondary"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Téléphone secondaire
               </label>
               <input
+                id="settings-contact_phone_secondary"
                 type="text"
                 name="contact_phone_secondary"
                 value={form.contact_phone_secondary}
@@ -267,10 +291,14 @@ export default function SettingsManager() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-address"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Adresse
               </label>
               <textarea
+                id="settings-address"
                 rows="4"
                 name="address"
                 value={form.address}
@@ -321,10 +349,14 @@ export default function SettingsManager() {
 
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-facebook_url"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Facebook
               </label>
               <input
+                id="settings-facebook_url"
                 type="url"
                 name="facebook_url"
                 value={form.facebook_url}
@@ -335,10 +367,14 @@ export default function SettingsManager() {
             </div>
 
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-linkedin_url"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 LinkedIn
               </label>
               <input
+                id="settings-linkedin_url"
                 type="url"
                 name="linkedin_url"
                 value={form.linkedin_url}
@@ -349,10 +385,14 @@ export default function SettingsManager() {
             </div>
 
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-x_url"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 X
               </label>
               <input
+                id="settings-x_url"
                 type="url"
                 name="x_url"
                 value={form.x_url}
@@ -363,10 +403,14 @@ export default function SettingsManager() {
             </div>
 
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-youtube_url"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 YouTube
               </label>
               <input
+                id="settings-youtube_url"
                 type="url"
                 name="youtube_url"
                 value={form.youtube_url}
@@ -385,10 +429,14 @@ export default function SettingsManager() {
 
           <div className="mt-8 grid gap-6">
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="settings-footer_text"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Texte du footer
               </label>
               <textarea
+                id="settings-footer_text"
                 rows="5"
                 name="footer_text"
                 value={form.footer_text}

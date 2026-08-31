@@ -14,6 +14,9 @@ import { notFound } from "./middlewares/notFound.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { env } from "./config/env.js";
 import routes from "./routes/index.js";
+import { requireAuth } from "./middlewares/requireAuth.js";
+import { requireRole } from "./middlewares/requireRole.js";
+import { PublicationsModel } from "./models/publications.model.js";
 
 const app = express();
 
@@ -46,25 +49,68 @@ app.use(cookieParser());
 // Protection CSRF (double-submit cookie) pour toute mutation authentifiée par cookie
 app.use(csrfProtection);
 
-// Uploads publics (mis en cache 7 jours côté client/CDN)
+// Uploads publics : images et vidéos (contenu éditorial destiné au grand
+// public — bannières de sections, actualités, vidéos du discours, etc.),
+// mis en cache 7 jours côté client/CDN.
+const publicUploadHeaders = (res) => {
+  // Nécessaire car le frontend est servi depuis une origine différente
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+};
 app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "../uploads"), {
+  "/uploads/images",
+  express.static(path.join(__dirname, "../uploads/images"), {
     maxAge: "7d",
     immutable: true,
-    setHeaders: (res, filePath) => {
-      // Nécessaire car le frontend est servi depuis une origine différente
-      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-      // Le dossier documents (CV/lettres de motivation issus du formulaire
-      // public de candidature) est le plus sensible : on force le
-      // téléchargement plutôt que le rendu/l'exécution dans le navigateur.
-      const normalized = filePath.split(path.sep).join("/");
-      if (normalized.includes("/uploads/documents/")) {
-        res.setHeader("Content-Disposition", "attachment");
-      }
-    },
+    setHeaders: publicUploadHeaders,
   })
 );
+app.use(
+  "/uploads/videos",
+  express.static(path.join(__dirname, "../uploads/videos"), {
+    maxAge: "7d",
+    immutable: true,
+    setHeaders: publicUploadHeaders,
+  })
+);
+
+// Uploads du dossier "documents" : deux usages bien distincts y partagent le
+// même dossier physique — les CV/lettres de motivation (formulaire public de
+// candidature, doivent rester privés) et les fichiers de Publications
+// (rapports/communiqués, doivent rester publics). On les distingue par une
+// vérification en base plutôt que par un sous-dossier, pour ne pas casser
+// l'accès aux publications déjà en ligne : si le fichier demandé correspond à
+// une publication publiée, il est servi publiquement ; sinon, authentification
+// admin requise et téléchargement forcé (pas de rendu/exécution navigateur).
+app.get("/uploads/documents/:filename", async (req, res, next) => {
+  const filename = path.basename(req.params.filename); // anti path traversal
+  const filePath = path.join(__dirname, "../uploads/documents", filename);
+
+  let isPublishedPublication = false;
+  try {
+    isPublishedPublication = await PublicationsModel.existsByFileUrl(`/uploads/documents/${filename}`);
+  } catch (err) {
+    return next(err);
+  }
+
+  if (isPublishedPublication) {
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    return res.sendFile(filePath, (err) => {
+      if (err) next(err);
+    });
+  }
+
+  return requireAuth(req, res, (authErr) => {
+    if (authErr) return next(authErr);
+    return requireRole("superadmin", "admin_editeur")(req, res, (roleErr) => {
+      if (roleErr) return next(roleErr);
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+      res.setHeader("Content-Disposition", "attachment");
+      res.sendFile(filePath, (err) => {
+        if (err) next(err);
+      });
+    });
+  });
+});
 
 // Health check simple
 app.get("/health", (_req, res) => {

@@ -24,13 +24,27 @@ const navItems = [
   { to: "/admin/messages", label: "Messages", icon: Mail },
   { to: "/admin/recrutements", label: "Recrutements", icon: Briefcase },
   { to: "/admin/candidatures", label: "Candidatures", icon: UserCheck },
-  { to: "/admin/administrateurs", label: "Administrateurs", icon: Users },
-  { to: "/admin/parametres", label: "Paramètres", icon: Settings },
+  {
+    to: "/admin/administrateurs",
+    label: "Administrateurs",
+    icon: Users,
+    roles: ["superadmin"],
+  },
+  {
+    to: "/admin/parametres",
+    label: "Paramètres",
+    icon: Settings,
+    roles: ["superadmin"],
+  },
 ];
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const visibleNavItems = navItems.filter(
+    (item) => !item.roles || item.roles.includes(user?.role)
+  );
 
   async function handleLogout() {
     await logout();
@@ -69,7 +83,7 @@ export default function AdminLayout() {
             </div>
 
             <nav className="mt-6 flex flex-col gap-2">
-              {navItems.map((item) => {
+              {visibleNavItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <NavLink

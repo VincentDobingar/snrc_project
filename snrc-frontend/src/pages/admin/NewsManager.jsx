@@ -236,10 +236,14 @@ export default function NewsManager() {
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="news-title"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Titre
             </label>
             <input
+              id="news-title"
               type="text"
               name="title"
               value={form.title}
@@ -250,10 +254,14 @@ export default function NewsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="news-slug"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Slug
             </label>
             <input
+              id="news-slug"
               type="text"
               name="slug"
               value={form.slug}
@@ -264,10 +272,14 @@ export default function NewsManager() {
           </div>
 
           <div className="md:col-span-2">
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="news-summary"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Résumé
             </label>
             <textarea
+              id="news-summary"
               rows="4"
               name="summary"
               value={form.summary}
@@ -304,10 +316,14 @@ export default function NewsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="news-published_at"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Date de publication
             </label>
             <input
+              id="news-published_at"
               type="datetime-local"
               name="published_at"
               value={form.published_at}
@@ -317,10 +333,14 @@ export default function NewsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="news-status"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Statut
             </label>
             <select
+              id="news-status"
               name="status"
               value={form.status}
               onChange={handleChange}

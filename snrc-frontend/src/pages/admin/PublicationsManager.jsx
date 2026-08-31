@@ -279,10 +279,14 @@ export default function PublicationsManager() {
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="publication-title"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Titre
             </label>
             <input
+              id="publication-title"
               type="text"
               name="title"
               value={form.title}
@@ -293,10 +297,14 @@ export default function PublicationsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="publication-slug"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Slug
             </label>
             <input
+              id="publication-slug"
               type="text"
               name="slug"
               value={form.slug}
@@ -307,10 +315,14 @@ export default function PublicationsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="publication-category_id"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Catégorie
             </label>
             <select
+              id="publication-category_id"
               name="category_id"
               value={form.category_id}
               onChange={handleChange}
@@ -326,10 +338,14 @@ export default function PublicationsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="publication-published_at"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Date de publication
             </label>
             <input
+              id="publication-published_at"
               type="datetime-local"
               name="published_at"
               value={form.published_at}
@@ -379,10 +395,14 @@ export default function PublicationsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="publication-status"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Statut
             </label>
             <select
+              id="publication-status"
               name="status"
               value={form.status}
               onChange={handleChange}

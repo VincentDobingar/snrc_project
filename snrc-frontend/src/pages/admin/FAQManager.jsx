@@ -162,10 +162,14 @@ export default function FAQManager() {
 
         <div className="mt-8 grid gap-6">
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="faq-question"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Question
             </label>
             <input
+              id="faq-question"
               type="text"
               name="question"
               value={form.question}
@@ -176,10 +180,14 @@ export default function FAQManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="faq-answer"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Réponse
             </label>
             <textarea
+              id="faq-answer"
               rows="6"
               name="answer"
               value={form.answer}
@@ -191,10 +199,14 @@ export default function FAQManager() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="faq-display_order"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Ordre d’affichage
               </label>
               <input
+                id="faq-display_order"
                 type="number"
                 name="display_order"
                 value={form.display_order}
@@ -204,10 +216,14 @@ export default function FAQManager() {
             </div>
 
             <div>
-              <label className="mb-2 block font-medium text-snrc-blue">
+              <label
+                htmlFor="faq-status"
+                className="mb-2 block font-medium text-snrc-blue"
+              >
                 Statut
               </label>
               <select
+                id="faq-status"
                 name="status"
                 value={form.status}
                 onChange={handleChange}

@@ -11,28 +11,55 @@ import { resolveMediaUrl, formatDate } from "../../utils/media";
 export default function NewsDetail() {
   const { slug } = useParams();
   const [news, setNews] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [loadedSlug, setLoadedSlug] = useState(null);
+  const loading = loadedSlug !== slug;
 
   useEffect(() => {
-    setLoading(true);
-    setNotFound(false);
+    let cancelled = false;
 
     getNewsBySlug(slug)
       .then((data) => {
+        if (cancelled) return;
         if (!data) {
           setNotFound(true);
-          return;
+          setNews(null);
+        } else {
+          setNotFound(false);
+          setNews(data);
         }
-        setNews(data);
       })
-      .catch(() => setNotFound(true))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (cancelled) return;
+        setNotFound(true);
+        setNews(null);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoadedSlug(slug);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
+
+  const pageMeta = usePageMeta(
+    loading
+      ? { title: "Chargement..." }
+      : notFound || !news
+      ? { title: "Actualité introuvable", noindex: true }
+      : {
+          title: news.title,
+          description: news.summary,
+          image: resolveMediaUrl(news.featured_image),
+        }
+  );
 
   if (loading) {
     return (
       <section className="section-snrc bg-white">
+        {pageMeta}
         <Container>
           <p className="text-snrc-blue/80">Chargement de l’actualité...</p>
         </Container>
@@ -43,6 +70,7 @@ export default function NewsDetail() {
   if (notFound || !news) {
     return (
       <section className="section-snrc bg-white">
+        {pageMeta}
         <Container className="text-center">
           <h1 className="font-display text-3xl font-bold text-snrc-blue">
             Actualité introuvable
@@ -61,11 +89,7 @@ export default function NewsDetail() {
 
   return (
     <>
-      {usePageMeta({
-        title: news.title,
-        description: news.summary,
-        image: resolveMediaUrl(news.featured_image),
-      })}
+      {pageMeta}
 
       <PageBanner
         title={news.title}

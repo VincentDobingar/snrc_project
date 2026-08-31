@@ -193,10 +193,14 @@ export default function PagesManager() {
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="page-title"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Titre
             </label>
             <input
+              id="page-title"
               type="text"
               name="title"
               value={form.title}
@@ -207,10 +211,14 @@ export default function PagesManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="page-slug"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Slug
             </label>
             <input
+              id="page-slug"
               type="text"
               name="slug"
               value={form.slug}
@@ -221,10 +229,14 @@ export default function PagesManager() {
           </div>
 
           <div className="md:col-span-2">
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="page-summary"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Résumé
             </label>
             <textarea
+              id="page-summary"
               rows="3"
               name="summary"
               value={form.summary}
@@ -245,10 +257,14 @@ export default function PagesManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="page-banner_image"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Image de bannière
             </label>
             <input
+              id="page-banner_image"
               type="text"
               name="banner_image"
               value={form.banner_image}
@@ -259,10 +275,14 @@ export default function PagesManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="page-status"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Statut
             </label>
             <select
+              id="page-status"
               name="status"
               value={form.status}
               onChange={handleChange}
@@ -274,10 +294,14 @@ export default function PagesManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="page-meta_title"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Meta title
             </label>
             <input
+              id="page-meta_title"
               type="text"
               name="meta_title"
               value={form.meta_title}
@@ -288,10 +312,14 @@ export default function PagesManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="page-meta_description"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Meta description
             </label>
             <input
+              id="page-meta_description"
               type="text"
               name="meta_description"
               value={form.meta_description}

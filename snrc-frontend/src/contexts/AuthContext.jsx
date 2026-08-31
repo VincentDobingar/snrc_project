@@ -1,7 +1,6 @@
-import { createContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getMe, loginAdmin, logoutAdmin } from "../api/authApi";
-
-export const AuthContext = createContext(null);
+import { AuthContext } from "./authContextObject";
 
 const isAdminPath = () =>
   typeof window !== "undefined" &&

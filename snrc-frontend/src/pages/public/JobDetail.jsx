@@ -25,8 +25,9 @@ function formatDate(value) {
 export default function JobDetail() {
   const { slug } = useParams();
   const [job, setJob] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [loadedSlug, setLoadedSlug] = useState(null);
+  const loading = loadedSlug !== slug;
 
   const [form, setForm] = useState(initialForm);
   const [cvFile, setCvFile] = useState(null);
@@ -36,19 +37,32 @@ export default function JobDetail() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
-    setNotFound(false);
+    let cancelled = false;
 
     getJobBySlug(slug)
       .then((data) => {
+        if (cancelled) return;
         if (!data) {
           setNotFound(true);
-          return;
+          setJob(null);
+        } else {
+          setNotFound(false);
+          setJob(data);
         }
-        setJob(data);
       })
-      .catch(() => setNotFound(true))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (cancelled) return;
+        setNotFound(true);
+        setJob(null);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoadedSlug(slug);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
   function handleChange(e) {
@@ -91,9 +105,18 @@ export default function JobDetail() {
     }
   }
 
+  const pageMeta = usePageMeta(
+    loading
+      ? { title: "Chargement..." }
+      : notFound || !job
+      ? { title: "Offre introuvable", noindex: true }
+      : { title: job.title, description: job.summary }
+  );
+
   if (loading) {
     return (
       <section className="section-snrc bg-white">
+        {pageMeta}
         <Container>
           <p className="text-snrc-blue/80">Chargement de l’offre...</p>
         </Container>
@@ -104,6 +127,7 @@ export default function JobDetail() {
   if (notFound || !job) {
     return (
       <section className="section-snrc bg-white">
+        {pageMeta}
         <Container className="text-center">
           <h1 className="font-display text-3xl font-bold text-snrc-blue">
             Offre introuvable
@@ -124,7 +148,7 @@ export default function JobDetail() {
 
   return (
     <>
-      {usePageMeta({ title: job.title, description: job.summary })}
+      {pageMeta}
 
       <PageBanner
         title={job.title}
@@ -194,10 +218,14 @@ export default function JobDetail() {
             ) : (
               <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
                 <div>
-                  <label className="mb-2 block font-medium text-snrc-blue">
+                  <label
+                    htmlFor="job-apply-full_name"
+                    className="mb-2 block font-medium text-snrc-blue"
+                  >
                     Nom complet
                   </label>
                   <input
+                    id="job-apply-full_name"
                     type="text"
                     name="full_name"
                     value={form.full_name}
@@ -209,10 +237,14 @@ export default function JobDetail() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block font-medium text-snrc-blue">
+                  <label
+                    htmlFor="job-apply-email"
+                    className="mb-2 block font-medium text-snrc-blue"
+                  >
                     Email
                   </label>
                   <input
+                    id="job-apply-email"
                     type="email"
                     name="email"
                     value={form.email}
@@ -224,10 +256,14 @@ export default function JobDetail() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block font-medium text-snrc-blue">
+                  <label
+                    htmlFor="job-apply-phone"
+                    className="mb-2 block font-medium text-snrc-blue"
+                  >
                     Téléphone
                   </label>
                   <input
+                    id="job-apply-phone"
                     type="text"
                     name="phone"
                     value={form.phone}
@@ -238,10 +274,14 @@ export default function JobDetail() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block font-medium text-snrc-blue">
+                  <label
+                    htmlFor="job-apply-education_level"
+                    className="mb-2 block font-medium text-snrc-blue"
+                  >
                     Diplôme / niveau d’étude
                   </label>
                   <input
+                    id="job-apply-education_level"
                     type="text"
                     name="education_level"
                     value={form.education_level}
@@ -252,10 +292,14 @@ export default function JobDetail() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block font-medium text-snrc-blue">
+                  <label
+                    htmlFor="job-apply-cover_letter_text"
+                    className="mb-2 block font-medium text-snrc-blue"
+                  >
                     Lettre de motivation
                   </label>
                   <textarea
+                    id="job-apply-cover_letter_text"
                     rows="4"
                     name="cover_letter_text"
                     value={form.cover_letter_text}
@@ -266,10 +310,14 @@ export default function JobDetail() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block font-medium text-snrc-blue">
+                  <label
+                    htmlFor="job-apply-cv"
+                    className="mb-2 block font-medium text-snrc-blue"
+                  >
                     CV (PDF ou Word) *
                   </label>
                   <input
+                    id="job-apply-cv"
                     type="file"
                     accept=".pdf,.doc,.docx"
                     required
@@ -279,10 +327,14 @@ export default function JobDetail() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block font-medium text-snrc-blue">
+                  <label
+                    htmlFor="job-apply-cover-letter-file"
+                    className="mb-2 block font-medium text-snrc-blue"
+                  >
                     Lettre de motivation (fichier PDF, optionnel)
                   </label>
                   <input
+                    id="job-apply-cover-letter-file"
                     type="file"
                     accept=".pdf"
                     onChange={(e) => setCoverLetterFile(e.target.files?.[0] || null)}

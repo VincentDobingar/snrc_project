@@ -34,6 +34,13 @@ export const PublicationsModel = {
     );
     return result.rows[0] || null;
   },
+  async existsByFileUrl(fileUrl) {
+    const result = await query(
+      `SELECT 1 FROM publications WHERE file_url=$1 AND status='published' LIMIT 1`,
+      [fileUrl]
+    );
+    return result.rows.length > 0;
+  },
   async listCategories() {
     const result = await query(`SELECT * FROM publication_categories ORDER BY name ASC`);
     return result.rows;

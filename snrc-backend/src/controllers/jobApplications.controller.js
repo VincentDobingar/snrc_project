@@ -1,6 +1,8 @@
 import { JobOffersModel } from "../models/jobs.model.js";
 import { JobApplicationsModel } from "../models/jobApplications.model.js";
 import { ok } from "../utils/apiResponse.js";
+import { DOCUMENT_MIME_TYPES } from "../middlewares/upload.js";
+import { verifyUploadedFilesContent } from "../middlewares/verifyFileContent.js";
 
 export const JobApplicationsController = {
   async apply(req, res, next) {
@@ -18,6 +20,13 @@ export const JobApplicationsController = {
       return next(error);
     }
     const coverLetterFile = req.files?.cover_letter_file?.[0];
+
+    const isValid = await verifyUploadedFilesContent([cvFile, coverLetterFile], DOCUMENT_MIME_TYPES);
+    if (!isValid) {
+      const error = new Error("Le contenu d'un des fichiers envoyés ne correspond pas à un type de document autorisé");
+      error.status = 400;
+      return next(error);
+    }
 
     const application = await JobApplicationsModel.create({
       job_offer_id: job.id,

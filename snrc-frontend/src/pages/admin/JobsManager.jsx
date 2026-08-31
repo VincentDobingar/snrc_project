@@ -226,10 +226,14 @@ export default function JobsManager() {
 
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="job-title"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Titre du poste
             </label>
             <input
+              id="job-title"
               type="text"
               name="title"
               value={form.title}
@@ -240,10 +244,14 @@ export default function JobsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="job-slug"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Slug
             </label>
             <input
+              id="job-slug"
               type="text"
               name="slug"
               value={form.slug}
@@ -254,10 +262,14 @@ export default function JobsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="job-contract_type"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Type de contrat
             </label>
             <select
+              id="job-contract_type"
               name="contract_type"
               value={form.contract_type}
               onChange={handleChange}
@@ -272,10 +284,14 @@ export default function JobsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="job-location"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Lieu
             </label>
             <input
+              id="job-location"
               type="text"
               name="location"
               value={form.location}
@@ -286,10 +302,14 @@ export default function JobsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="job-application_deadline"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Date limite de candidature
             </label>
             <input
+              id="job-application_deadline"
               type="datetime-local"
               name="application_deadline"
               value={form.application_deadline}
@@ -299,10 +319,14 @@ export default function JobsManager() {
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="job-status"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Statut
             </label>
             <select
+              id="job-status"
               name="status"
               value={form.status}
               onChange={handleChange}
@@ -315,10 +339,14 @@ export default function JobsManager() {
           </div>
 
           <div className="md:col-span-2">
-            <label className="mb-2 block font-medium text-snrc-blue">
+            <label
+              htmlFor="job-summary"
+              className="mb-2 block font-medium text-snrc-blue"
+            >
               Résumé
             </label>
             <textarea
+              id="job-summary"
               rows="3"
               name="summary"
               value={form.summary}

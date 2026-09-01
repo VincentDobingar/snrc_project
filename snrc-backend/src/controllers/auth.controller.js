@@ -5,6 +5,12 @@ import { AuthModel } from "../models/auth.model.js";
 import { ok } from "../utils/apiResponse.js";
 import { buildAuthCookieOptions } from "../utils/cookies.js";
 import { issueCsrfToken, clearCsrfToken } from "../utils/csrf.js";
+import { isAccountLocked, recordFailedLogin, clearFailedLogins } from "../utils/accountLockout.js";
+
+// Hash factice comparé à mot de passe constant : consomme un temps de calcul
+// bcrypt similaire au chemin "email connu" pour empêcher un attaquant de
+// déduire, par la durée de réponse, si un email correspond à un compte admin.
+const DUMMY_HASH = bcrypt.hashSync("dummy-password-for-constant-time-compare", 10);
 
 function signToken(user) {
   return jwt.sign(
@@ -23,9 +29,18 @@ function signToken(user) {
 export const AuthController = {
   async login(req, res, next) {
     const { email, password } = req.body;
+
+    if (isAccountLocked(email)) {
+      const error = new Error("Trop de tentatives échouées pour ce compte. Réessayez dans quelques minutes.");
+      error.status = 429;
+      return next(error);
+    }
+
     const user = await AuthModel.findByEmail(email);
 
     if (!user) {
+      await bcrypt.compare(password, DUMMY_HASH);
+      recordFailedLogin(email);
       const error = new Error("Identifiants invalides");
       error.status = 401;
       return next(error);
@@ -37,11 +52,13 @@ export const AuthController = {
     }
     const isValid = await bcrypt.compare(password, user.password_hash);
     if (!isValid) {
+      recordFailedLogin(email);
       const error = new Error("Identifiants invalides");
       error.status = 401;
       return next(error);
     }
 
+    clearFailedLogins(email);
     await AuthModel.touchLastLogin(user.id);
     const token = signToken(user);
     res.cookie(env.COOKIE_NAME, token, buildAuthCookieOptions());

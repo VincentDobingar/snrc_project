@@ -48,10 +48,11 @@ export const AdminUsersController = {
     const lastSuperadminGuardApplies =
       existing.role === "superadmin" && (newStatus === "inactive" || newRole !== "superadmin");
     // Révocation des sessions déjà émises (bump token_version) : toute
-    // désactivation, quel que soit le rôle, ainsi que la rétrogradation d'un
-    // superadmin, doivent invalider immédiatement les JWT déjà en circulation
-    // (requireAuth ne vérifie pas admins.status, seulement token_version).
-    const revokesSecurity = newStatus === "inactive" || (existing.role === "superadmin" && newRole !== "superadmin");
+    // désactivation ET tout changement de rôle (dans les deux sens) doivent
+    // invalider immédiatement les JWT déjà en circulation (requireAuth ne
+    // vérifie pas admins.status/role, seulement token_version — sans ce bump,
+    // un changement de rôle ne prend effet qu'au prochain refresh/login).
+    const revokesSecurity = newStatus === "inactive" || newRole !== existing.role;
 
     let user;
     try {

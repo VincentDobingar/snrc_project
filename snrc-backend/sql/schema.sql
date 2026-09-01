@@ -108,7 +108,8 @@ CREATE TABLE IF NOT EXISTS messages (
     subject VARCHAR(180) NOT NULL,
     message TEXT NOT NULL,
     is_read BOOLEAN NOT NULL DEFAULT FALSE,
-    status VARCHAR(20) NOT NULL DEFAULT 'new',
+    -- Vocabulaire aligné sur job_applications.status ("nouveau"/"lu")
+    status VARCHAR(20) NOT NULL DEFAULT 'nouveau',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -134,18 +135,6 @@ CREATE TABLE IF NOT EXISTS settings (
 -- Garantit qu'il ne peut jamais exister plus d'une ligne dans settings, même en
 -- cas d'écritures concurrentes lors de la toute première initialisation.
 CREATE UNIQUE INDEX IF NOT EXISTS settings_singleton_idx ON settings ((true));
-
-CREATE TABLE IF NOT EXISTS media (
-    id SERIAL PRIMARY KEY,
-    file_name VARCHAR(255) NOT NULL,
-    original_name VARCHAR(255) NOT NULL,
-    file_path VARCHAR(255) NOT NULL,
-    mime_type VARCHAR(120) NOT NULL,
-    file_size INTEGER NOT NULL,
-    media_type VARCHAR(30) NOT NULL,
-    uploaded_by INTEGER REFERENCES admins(id) ON DELETE SET NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
 
 CREATE TABLE IF NOT EXISTS job_offers (
     id SERIAL PRIMARY KEY,

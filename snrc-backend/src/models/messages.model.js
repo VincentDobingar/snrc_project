@@ -21,9 +21,13 @@ export const MessagesModel = {
     return result.rows[0];
   },
   async markAsRead(id, is_read = true) {
+    // Vocabulaire aligné sur job_applications.status ("lu"/"nouveau") : les
+    // deux ressources ont la même sémantique read/unread, elles doivent
+    // utiliser le même vocabulaire plutôt que l'un en français, l'autre en
+    // anglais.
     const result = await query(
       `UPDATE messages SET is_read=$1, status=$2 WHERE id=$3 RETURNING *`,
-      [is_read, is_read ? "read" : "new", id]
+      [is_read, is_read ? "lu" : "nouveau", id]
     );
     return result.rows[0] || null;
   },

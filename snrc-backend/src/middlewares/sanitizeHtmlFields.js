@@ -12,6 +12,20 @@ const SANITIZE_OPTIONS = {
   },
   allowedSchemes: ["http", "https", "mailto"],
   allowedSchemesByTag: { img: ["http", "https", "data"] },
+  // "style" reste autorisé (mise en forme de l'éditeur riche) mais restreint à
+  // des propriétés de présentation inoffensives : pas de position/top/left/
+  // z-index, qui permettraient à un contenu admin compromis de superposer un
+  // élément par-dessus le reste de la page (spoofing visuel/clickjacking).
+  allowedStyles: {
+    "*": {
+      color: [/^#[0-9a-f]{3,8}$/i, /^rgb\(/i, /^rgba\(/i, /^[a-z]+$/i],
+      "background-color": [/^#[0-9a-f]{3,8}$/i, /^rgb\(/i, /^rgba\(/i, /^[a-z]+$/i],
+      "text-align": [/^(left|right|center|justify)$/],
+      "font-weight": [/^(bold|normal|[1-9]00)$/],
+      "font-style": [/^(italic|normal)$/],
+      "text-decoration": [/^(underline|line-through|none)$/],
+    },
+  },
 };
 
 // Nettoie le HTML riche produit par l'éditeur admin avant écriture en base :

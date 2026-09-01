@@ -22,7 +22,8 @@ export const JobOffersModel = {
   },
   async findBySlug(slug) {
     const result = await query(
-      `SELECT * FROM job_offers WHERE slug=$1 AND status='published' LIMIT 1`,
+      `SELECT * FROM job_offers WHERE slug=$1 AND status='published'
+       AND (application_deadline IS NULL OR application_deadline >= NOW()) LIMIT 1`,
       [slug]
     );
     return result.rows[0] || null;

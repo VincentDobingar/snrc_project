@@ -8,7 +8,8 @@ import { parsePagination } from "../utils/pagination.js";
 export const JobApplicationsController = {
   async apply(req, res, next) {
     const job = await JobOffersModel.findById(req.params.id);
-    if (!job || job.status !== "published") {
+    const deadlinePassed = job?.application_deadline && new Date(job.application_deadline) < new Date();
+    if (!job || job.status !== "published" || deadlinePassed) {
       const error = new Error("Offre d'emploi introuvable ou fermée");
       error.status = 404;
       return next(error);

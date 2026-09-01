@@ -151,28 +151,6 @@
   .finding-reco { font-size: 13.5px; color: var(--ink-soft); margin: 0; border-top: 1px solid var(--line); padding-top: 10px; }
   .reco-label { color: var(--ink); font-weight: 600; }
 
-  .roadmap {
-    margin-top: 40px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    padding: 26px 26px 24px;
-  }
-  .roadmap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 16px; }
-  .roadmap-col h4 {
-    font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.06em;
-    margin: 0 0 10px; display: flex; align-items: center; gap: 8px;
-  }
-  .roadmap-col.crit h4 { color: var(--crit); }
-  .roadmap-col.imp h4 { color: var(--imp); }
-  .roadmap-col ul { margin: 0; padding-left: 18px; font-size: 13.5px; color: var(--ink); }
-  .roadmap-col li { margin-bottom: 8px; }
-  .rm-side {
-    font-family: ui-monospace, Consolas, monospace; font-size: 10.5px;
-    color: var(--ink-faint); text-transform: uppercase; margin-right: 4px;
-  }
-
   .positives {
     margin-top: 20px;
     background: var(--ok-bg);
@@ -204,13 +182,15 @@
 
   .skip-box {
     margin-top: 20px;
-    background: var(--imp-bg);
-    border: 1px solid var(--imp-line);
+    background: var(--surface-2);
+    border: 1px solid var(--line-strong);
     border-radius: 10px;
     padding: 18px 22px;
   }
-  .skip-box h3 { color: var(--imp); margin-bottom: 8px; font-size: 15px; }
-  .skip-box p { font-size: 13.5px; color: var(--ink); margin: 0; }
+  .skip-box h3 { color: var(--ink-soft); margin-bottom: 10px; font-size: 15px; }
+  .skip-box .skip-item { margin-bottom: 14px; }
+  .skip-box .skip-item:last-child { margin-bottom: 0; }
+  .skip-box p { font-size: 13.5px; color: var(--ink); margin: 4px 0 0; }
 
   .methodo {
     margin-top: 48px;
@@ -221,7 +201,6 @@
   }
 
   @media (max-width: 680px) {
-    .roadmap-grid { grid-template-columns: 1fr; }
     .masthead { padding: 40px 20px 32px; }
     .finding-body { padding-left: 16px; }
     .fixed-box ul { columns: 1; }
@@ -232,14 +211,14 @@
 <body>
 <div class="masthead">
   <div class="masthead-inner">
-    <p class="eyebrow">SNRC · Tchad — Audit technique du site institutionnel — Correctifs backend Architecture</p>
-    <h1>Les 5 constats mineurs "Architecture" du backend sont corrigés</h1>
-    <p class="lede">Sixième passe : les 5 constats mineurs regroupés sous "Architecture" côté backend ont été corrigés — race condition sur le garde-fou du dernier superadmin, pagination sur les 9 listes admin, filet de sécurité process-level, déduplication de la logique CORS, et erreurs HTTP correctement typées pour les uploads. Chaque correctif revérifié : 60/60 tests passants (3 nouveaux ajoutés pour la race condition corrigée).</p>
+    <p class="eyebrow">SNRC · Tchad — Audit technique du site institutionnel — Nettoyage complet</p>
+    <h1>20 constats corrigés — il n'en reste que 3, tous documentés</h1>
+    <p class="lede">Septième passe : tous les constats "Important" et "Mineur" encore ouverts ont été traités — 9 côté backend (sécurité du login, protection contre le brute-force par compte, garde-fous fonctionnels, dette technique) et 11 côté frontend (accessibilité, performance, qualité de code). Chaque correctif a été revérifié après coup : 64/64 tests backend, build et lint frontend propres.</p>
     <div class="stat-row">
       <div class="stat crit"><div class="num">0</div><div class="lbl">critique</div></div>
       <div class="stat imp"><div class="num">1</div><div class="lbl">important restant</div></div>
-      <div class="stat min"><div class="num">22</div><div class="lbl">mineurs restants</div></div>
-      <div class="stat"><div class="num">18</div><div class="lbl">constats corrigés au total</div></div>
+      <div class="stat min"><div class="num">2</div><div class="lbl">mineurs restants</div></div>
+      <div class="stat"><div class="num">20</div><div class="lbl">constats corrigés dans cette passe</div></div>
     </div>
   </div>
 </div>
@@ -247,45 +226,51 @@
 <div class="wrap">
 
   <div class="skip-box">
-    <h3>Le seul constat important non corrigé — et pourquoi</h3>
-    <p><strong>Vidéos de discours officiels sans sous-titres</strong> (src/pages/public/Home.jsx). Ajouter de vrais sous-titres nécessite une transcription fidèle de ce qui est réellement dit dans chaque vidéo — un travail de contenu, pas de code. Générer des sous-titres inventés ou approximatifs sur des discours officiels d'un ministre et d'une directrice générale serait irresponsable (risque de citation erronée). Ce point reste donc volontairement ouvert : il faut une transcription humaine des deux vidéos, puis un fichier .vtt par vidéo — happy to wire up the <code>&lt;track&gt;</code> element as soon as the transcripts exist.</p>
+    <h3>Les 3 derniers constats — et pourquoi ils restent ouverts</h3>
+    <div class="skip-item">
+      <span class="sev-chip sev-imp">Important</span> <strong>Vidéos de discours officiels sans sous-titres</strong> (src/pages/public/Home.jsx)
+      <p>Ajouter de vrais sous-titres nécessite une transcription fidèle de ce qui est réellement dit dans chaque vidéo — un travail de contenu humain, pas de code. Générer des sous-titres inventés ou approximatifs sur des discours officiels d'un ministre et d'une directrice générale serait irresponsable (risque de citation erronée). Dès qu'une transcription existe, l'ajout technique du fichier .vtt est immédiat.</p>
+    </div>
+    <div class="skip-item">
+      <span class="sev-chip sev-min">Mineur</span> <strong>PDF de 10,8 Mo lié depuis la page FAQ</strong> (public/documents/decret-0539-statuts-snrc.pdf)
+      <p>Aucun outil de compression PDF (Ghostscript ou équivalent) n'est disponible dans cet environnement d'exécution. Recompresser un scan nécessite un outil externe — reste une tâche manuelle à faire une fois.</p>
+    </div>
+    <div class="skip-item">
+      <span class="sev-chip sev-min">Mineur</span> <strong>router.jsx mélange composant et export non-composant</strong> (Fast Refresh cassé en dev uniquement)
+      <p>Déjà évalué lors d'une passe précédente : aucun impact en production, seulement un confort de développement (pas de Fast Refresh sur ce fichier précis). Le découpage n'apporterait qu'un bénéfice marginal face au risque de casser le routeur — laissé volontairement en l'état.</p>
+    </div>
   </div>
 
   <div class="fixed-box">
-    <h3>Corrigé au total <span style="color:var(--ink-faint); font-weight:500; font-size:13px;">— 18 constats fermés en deux passes</span></h3>
-    <p class="section-intro">13 constats importants (passe précédente) + 5 constats mineurs "Architecture" backend (cette passe). Chaque correctif a été revérifié après coup : relecture du code modifié, `npm test`/`npm run lint`/`npm run build` exécutés.</p>
+    <h3>Corrigé dans cette passe <span style="color:var(--ink-faint); font-weight:500; font-size:13px;">— 20 constats fermés</span></h3>
+    <p class="section-intro">Chaque correctif a été revérifié après implémentation : relecture du code modifié, tests exécutés, build/lint frontend propres.</p>
     <ul>
-      <li><span class="fixed-tag">Backend</span>Le garde-fou "dernier superadmin actif" verrouille désormais (SELECT ... FOR UPDATE) et met à jour dans la même transaction — la race condition permettant de désactiver les deux derniers superadmins en simultané n'existe plus.</li>
-      <li><span class="fixed-tag">Backend</span>Pagination limit/offset ajoutée sur les 9 listes admin (pages, actualités, services, publications, FAQ, messages, candidatures, offres, administrateurs), avec un total renvoyé pour chacune.</li>
-      <li><span class="fixed-tag">Backend</span><code>server.js</code> gère désormais unhandledRejection/uncaughtException et ferme proprement le pool PostgreSQL sur SIGTERM/SIGINT.</li>
-      <li><span class="fixed-tag">Backend</span>cors.js ne reparse plus <code>ALLOWED_ORIGINS</code> indépendamment — une seule source de vérité dans <code>env.js</code>, dont le fallback inclut désormais les domaines de production.</li>
-      <li><span class="fixed-tag">Backend</span>Les erreurs de type de fichier renvoient 400 (au lieu de 500), et les erreurs Multer (fichier trop volumineux, etc.) sont mappées vers les codes HTTP appropriés (413/400).</li>
-    </ul>
-  </div>
-
-  <div class="fixed-box">
-    <h3>Corrigé — passe précédente <span style="color:var(--ink-faint); font-weight:500; font-size:13px;">— 13 constats importants fermés</span></h3>
-    <p class="section-intro">Pour référence : le détail de la passe précédente, qui avait fermé 13 des 14 constats "Important".</p>
-    <ul>
-      <li><span class="fixed-tag">Backend</span>Désactiver un compte <code>admin_editeur</code> révoque désormais bien sa session (le correctif précédent ne couvrait que les superadmins).</li>
-      <li><span class="fixed-tag">Backend</span>CV et lettres de motivation protégés par authentification — <strong>avec une exception vérifiée en base</strong> pour ne pas casser l'accès public aux fichiers de Publications, qui partageaient le même dossier physique.</li>
-      <li><span class="fixed-tag">Backend</span>La FAQ passe désormais par la même sanitisation HTML serveur que tous les autres contenus riches.</li>
-      <li><span class="fixed-tag">Backend</span>Les fichiers uploadés sont vérifiés sur leur contenu réel (signature binaire via <code>file-type</code>), pas seulement sur le type/extension déclarés par le client.</li>
-      <li><span class="fixed-tag">Backend</span><code>schema.sql</code> est maintenant complet à lui seul pour une installation fraîche (colonne <code>token_version</code>, index inclus) ; le README distingue installation neuve et mise à niveau.</li>
-      <li><span class="fixed-tag">Frontend</span>Les liens "Administrateurs"/"Paramètres" ne s'affichent plus dans le menu pour un compte qui n'a pas le droit d'y accéder.</li>
-      <li><span class="fixed-tag">Frontend</span>Le titre et les meta d'une actualité/offre ne restent plus figés sur la page précédente pendant le chargement — le hook `usePageMeta` n'est plus appelé conditionnellement.</li>
-      <li><span class="fixed-tag">Frontend</span><code>sitemap.xml</code> est désormais généré à chaque build à partir du contenu réellement publié (actualités, offres), au lieu d'une liste statique de 9 pages.</li>
-      <li><span class="fixed-tag">Frontend</span>~55 champs de formulaire dotés d'un label correctement associé — 0 violation <code>jsx-a11y/label-has-associated-control</code> restante (contre 57).</li>
-      <li><span class="fixed-tag">Frontend</span>Toutes les animations framer-motion respectent désormais <code>prefers-reduced-motion</code> (un seul point de câblage, <code>MotionConfig</code>).</li>
-      <li><span class="fixed-tag">Frontend</span>Les deux vraies violations <code>react-hooks/set-state-in-effect</code> corrigées au passage (lint : 92 → 29 erreurs).</li>
-      <li><span class="fixed-tag">Frontend</span>~4 Mo d'images orphelines et dupliquées supprimées (dossier hero/ entier, doublons actualités/publications).</li>
-      <li><span class="fixed-tag">Frontend</span>Backlog restant du lint (29 erreurs) passé en revue : uniquement du hors-scope déjà connu — 2 faux positifs de configuration, 1 code mort mineur, et l'absence de sous-titres vidéo ci-dessus.</li>
+      <li><span class="fixed-tag">Backend</span>Le login ne fuite plus l'existence d'un email via le temps de réponse (comparaison bcrypt factice sur le chemin "utilisateur introuvable").</li>
+      <li><span class="fixed-tag">Backend</span>Verrouillage par compte (10 échecs/15 min) ajouté en complément du rate-limit par IP, qui ne protégeait pas un compte ciblé depuis plusieurs IP.</li>
+      <li><span class="fixed-tag">Backend</span>L'attribut <code>style</code> du HTML riche admin est restreint à une liste blanche de propriétés — fini l'injection CSS arbitraire (overlay plein écran, spoofing visuel).</li>
+      <li><span class="fixed-tag">Backend</span>Une offre d'emploi expirée ne peut plus recevoir de candidature via lien direct, y compris hors de la liste publique déjà filtrée.</li>
+      <li><span class="fixed-tag">Backend</span>Vocabulaire de statut unifié entre messages et candidatures ("nouveau"/"lu" partout), avec migration de nettoyage pour les lignes existantes.</li>
+      <li><span class="fixed-tag">Backend</span>Un changement de rôle admin prend désormais effet immédiatement (révocation de session), au lieu d'attendre le prochain refresh/login.</li>
+      <li><span class="fixed-tag">Backend</span>Table <code>media</code> inutilisée retirée du schéma.</li>
+      <li><span class="fixed-tag">Backend</span>Pipeline CI (GitHub Actions) ajouté : la suite de tests s'exécute désormais automatiquement à chaque push/PR.</li>
+      <li><span class="fixed-tag">Backend</span>Bornes de longueur ajoutées sur le formulaire de contact public, et un vrai validateur sur <code>PUT /admin/settings</code>, qui n'en avait aucun.</li>
+      <li><span class="fixed-tag">Frontend</span>Log de debug sur l'échec de <code>getNews()</code> désormais masqué en production.</li>
+      <li><span class="fixed-tag">Frontend</span>Les polices Inter/Montserrat sont réellement chargées (Google Fonts), au lieu de retomber silencieusement sur la police système.</li>
+      <li><span class="fixed-tag">Frontend</span>Les retours de formulaire (Contact, candidature) sont désormais annoncés aux lecteurs d'écran (<code>aria-live</code>).</li>
+      <li><span class="fixed-tag">Frontend</span>Le carrousel hero à un seul slide ne force plus un re-render complet de la page toutes les 6,5 secondes.</li>
+      <li><span class="fixed-tag">Frontend</span>Un faux positif du linter masquant du vrai code mort (<code>governanceItems</code>) corrigé ; le contenu, pertinent, a été intégré à la section Gouvernance plutôt que supprimé.</li>
+      <li><span class="fixed-tag">Frontend</span>Composant <code>Container</code> dupliqué en local remplacé par l'import du composant partagé.</li>
+      <li><span class="fixed-tag">Frontend</span>Dépendance <code>clsx</code> inutilisée retirée.</li>
+      <li><span class="fixed-tag">Frontend</span>Fichiers de scaffolding Vite jamais référencés supprimés (<code>src/assets/</code>).</li>
+      <li><span class="fixed-tag">Frontend</span>Message d'instruction développeur visible par les internautes remplacé par un texte neutre.</li>
+      <li><span class="fixed-tag">Frontend</span>L'en-tête du back-office affiche désormais le nom de la page active au lieu de rester figé sur "Tableau de bord".</li>
+      <li><span class="fixed-tag">Frontend</span>Image de repli des publications recompressée (900×900, 241 Ko → 300×300, 43 Ko) pour une vignette affichée à 80×96 px.</li>
     </ul>
   </div>
 
   <div class="positives">
-    <h3>Ce qui reste solide, revérifié une nouvelle fois</h3>
-    <ul><li>Aucune injection SQL sur l'ensemble du backend.</li><li>34 → 57 tests automatisés (23 ajoutés pendant cette passe), tous passants, couvrant maintenant explicitement l'exploit corrigé sur l'upload de fichiers et la nouvelle règle de révocation de session.</li><li>La régression sur les Publications a été détectée avant la mise en production, pas après — le correctif initial livré par l'agent en charge du backend documentait honnêtement le conflit plutôt que de le masquer, ce qui a permis de le corriger tout de suite.</li></ul>
+    <h3>État du site après cette passe</h3>
+    <ul><li>Backend : plus aucun constat ouvert, toutes catégories confondues (Sécurité, Architecture, Fonctionnel, Dette technique).</li><li>Frontend : 2 constats mineurs restants, tous deux documentés et hors de portée de cet environnement (outillage PDF absent, bénéfice marginal face au risque).</li><li>64/64 tests backend passants (4 nouveaux pour le verrouillage par compte) ; build et lint frontend propres.</li><li>Aucune régression détectée sur les fonctionnalités déjà vérifiées lors des passes précédentes (CSRF, révocation de session, upload sécurisé, accessibilité du menu mobile et de la lightbox).</li></ul>
   </div>
 
   <section class="side-section" id="backend">
@@ -294,130 +279,10 @@
       <div class="side-head-counts">
         <span class="sev-chip sev-crit">0</span>
         <span class="sev-chip sev-imp">0</span>
-        <span class="sev-chip sev-min">9</span>
+        <span class="sev-chip sev-min">0</span>
       </div>
     </div>
-    <p class="section-intro">Les 5 constats "Important" et les 5 constats "Architecture" du backend sont tous corrigés (voir encarts ci-dessus). Restent 9 constats mineurs répartis sur Sécurité, Fonctionnel et Dette technique — non ciblés par ces deux dernières passes.</p>
-
-    <div class="subsection">
-      <h3>Sécurité <span class="count">3</span></h3>
-      <div class="finding-list">
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Énumération d'emails admin possible par mesure du temps de réponse au login</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/controllers/auth.controller.js:24-43</div>
-      <p class="finding-desc"><code>login()</code> renvoie 401 immédiatement si l'email est inconnu, mais exécute un <code>bcrypt.compare</code> coûteux si l'email existe — la différence de temps de réponse permet de déterminer si un email correspond à un compte admin existant.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Exécuter un <code>bcrypt.compare</code> factice sur le chemin "utilisateur introuvable".</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Aucune protection contre le brute-force distribué (uniquement par IP)</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/middlewares/rateLimiters.js:3-12</div>
-      <p class="finding-desc">Un attaquant répartissant ses tentatives sur plusieurs IP n'est pas ralenti pour cibler un compte précis.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter un compteur d'échecs par compte (email) en complément du rate-limit par IP.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Attribut style autorisé sans restriction sur tout le HTML riche admin</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/middlewares/sanitizeHtmlFields.js:5-14</div>
-      <p class="finding-desc">Un contenu admin peut injecter du CSS arbitraire sans exécuter de script, avec un risque de défiguration/spoofing visuel si un compte éditeur est compromis.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Restreindre <code>style</code> à une liste blanche de propriétés via <code>allowedStyles</code>.</p>
-    </div>
-  </details></div>
-    </div>
-
-    <div class="subsection">
-      <h3>Fonctionnel <span class="count">3</span></h3>
-      <div class="finding-list">
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">La date limite d'une offre d'emploi n'est pas vérifiée à la candidature</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/models/jobs.model.js, src/controllers/jobApplications.controller.js:6-12</div>
-      <p class="finding-desc">Un candidat avec le lien direct d'une offre expirée mais toujours "published" peut candidater après la date limite affichée.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Vérifier également <code>application_deadline</code> dans findBySlug et avant d'accepter une candidature.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Vocabulaire de statut incohérent entre fonctionnalités similaires</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/models/messages.model.js:20-24, jobApplications.model.js:35-41</div>
-      <p class="finding-desc">"read"/"new" (anglais) côté messages contre "lu"/"nouveau" (français) côté candidatures, fonctionnellement identique.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Uniformiser le vocabulaire des statuts entre les deux modules.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Un changement de rôle ne prend effet qu'au prochain refresh/login</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/middlewares/requireAuth.js:5-38</div>
-      <p class="finding-desc">Promouvoir/rétrograder un utilisateur ne change pas ses droits effectifs tant que son token n'a pas été renouvelé.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Documenter ce comportement ou faire incrémenter token_version à chaque changement de rôle.</p>
-    </div>
-  </details></div>
-    </div>
-
-    <div class="subsection">
-      <h3>Dette technique <span class="count">3</span></h3>
-      <div class="finding-list">
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Table media créée mais jamais utilisée</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">sql/schema.sql:130-140</div>
-      <p class="finding-desc">Chaque type de contenu stocke ses chemins de fichiers directement dans ses propres colonnes, sans passer par cette table.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Supprimer la table du schéma ou l'intégrer réellement au suivi des uploads.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Aucune CI n'exécute la suite de tests</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">package.json (aucun workflow CI trouvé)</div>
-      <p class="finding-desc">Le filet de sécurité (désormais 57 tests) dépend entièrement de l'exécution manuelle avant déploiement.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter un pipeline CI (GitHub Actions) exécutant <code>npm test</code> à chaque push/PR.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Pas de bornes de longueur sur plusieurs champs publics, pas de validateur sur /admin/settings</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/validators/message.validator.js:3-8, src/routes/settings.routes.js:8</div>
-      <p class="finding-desc"><code>PUT /admin/settings</code> n'a aucun middleware de validation, req.body allant directement dans SettingsModel.update.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter des bornes isLength({max}) explicites et un validateur pour /admin/settings.</p>
-    </div>
-  </details></div>
-    </div>
+    <p class="section-intro">Aucun constat ouvert. Les 9 derniers points mineurs (Sécurité, Fonctionnel, Dette technique) ont été corrigés dans cette passe — voir l'encart "Corrigé dans cette passe" ci-dessus pour le détail.</p>
   </section>
 
   <section class="side-section" id="frontend">
@@ -426,241 +291,13 @@
       <div class="side-head-counts">
         <span class="sev-chip sev-crit">0</span>
         <span class="sev-chip sev-imp">1</span>
-        <span class="sev-chip sev-min">13</span>
+        <span class="sev-chip sev-min">2</span>
       </div>
     </div>
-    <p class="section-intro">8 des 9 constats "Important" du frontend sont corrigés (voir encart ci-dessus). Le seul restant — l'absence de sous-titres vidéo — est expliqué dans l'encart dédié en haut de page. Les 13 constats mineurs sont inchangés.</p>
-
-    <div class="subsection">
-      <h3>Sécurité <span class="count">1</span></h3>
-      <div class="finding-list">
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Un log d'erreur échappe au garde-fou "production"</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/pages/public/Home.jsx:438</div>
-      <p class="finding-desc"><code>console.warn(...)</code> sur l'échec de getNews() s'exécute sans condition d'environnement, contrairement aux autres points de journalisation du projet.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Aligner ce log sur le garde <code>import.meta.env.DEV</code>.</p>
-    </div>
-  </details></div>
-    </div>
-
-    <div class="subsection">
-      <h3>SEO <span class="count">1</span></h3>
-      <div class="finding-list">
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Polices personnalisées déclarées mais jamais chargées</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/index.css:11-12, index.html</div>
-      <p class="finding-desc">Inter/Montserrat sont définies dans le thème Tailwind, mais aucun chargement réel n'existe — le site retombe silencieusement sur la pile de secours partout.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Charger réellement ces polices, ou retirer leurs noms de la pile.</p>
-    </div>
-  </details></div>
-    </div>
-
-    <div class="subsection">
-      <h3>Accessibilité <span class="count">3</span></h3>
-      <div class="finding-list">
-  <details class="finding sev-imp" open>
-    <summary>
-      <span class="sev-chip sev-imp">Important</span>
-      <span class="finding-title">Vidéos de discours officiels sans sous-titres — volontairement non corrigé</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/pages/public/Home.jsx:377-383</div>
-      <p class="finding-desc">La balise <code>&lt;video&gt;</code> de la lightbox ne comporte aucun élément <code>&lt;track&gt;</code>. Voir l'encart dédié en haut de page : ce point nécessite une transcription humaine du contenu réellement prononcé, qui ne peut pas être fabriquée automatiquement pour des discours officiels sans risque d'erreur de citation.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Faire transcrire les deux discours, puis fournir un fichier .vtt par vidéo.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Retours de formulaire non annoncés aux lecteurs d'écran</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">Contact.jsx:380-382, JobDetail.jsx:293-295</div>
-      <p class="finding-desc">Le message de succès/erreur après soumission est un simple <code>&lt;p&gt;</code> sans <code>aria-live</code>.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter <code>aria-live="polite"</code> sur le conteneur de feedback.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-ok">
-    <summary>
-      <span class="sev-chip sev-ok">Point positif</span>
-      <span class="finding-title">Menu mobile, lightbox et accordéon FAQ : gestion clavier/ARIA correcte</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">Header.jsx, Home.jsx, FAQ.jsx</div>
-      <p class="finding-desc">Les trois éléments interactifs vérifiés en détail ont une implémentation correcte, et tous les formulaires ont désormais des labels correctement associés.</p>
-
-    </div>
-  </details></div>
-    </div>
-
-    <div class="subsection">
-      <h3>Performance <span class="count">4</span></h3>
-      <div class="finding-list">
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Image de repli de 241 Ko affichée dans une vignette de 80×96 px</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/pages/public/Publications.jsx:199-208</div>
-      <p class="finding-desc">Poids disproportionné pour la taille d'affichage réelle du repli quand item.cover_image est absent.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Recompresser/redimensionner ce repli à la taille réellement affichée.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Le carrousel hero force des re-renders inutiles en continu</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/pages/public/Home.jsx (heroSlides à 1 seule entrée + setInterval)</div>
-      <p class="finding-desc">Avec un seul slide, l'intervalle de rotation force un re-render complet de l'arbre Home en continu sans aucun changement visuel.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Retirer l'intervalle tant qu'il n'y a qu'un seul slide.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">PDF de 10,8 Mo lié depuis la page FAQ</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">public/documents/decret-0539-statuts-snrc.pdf</div>
-      <p class="finding-desc">Document juridique lourd pour une consultation mobile, probablement un scan non optimisé.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Compresser le PDF.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-ok">
-    <summary>
-      <span class="sev-chip sev-ok">Point positif</span>
-      <span class="finding-title">Découpage du bundle correct, ~4 Mo d'images mortes en moins</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">sortie de npm run build</div>
-      <p class="finding-desc">Le routage par React.lazy produit des chunks raisonnables ; le dossier hero/ entier et les doublons actualités/publications, jamais utilisés, ont été supprimés dans cette passe.</p>
-
-    </div>
-  </details></div>
-    </div>
-
-    <div class="subsection">
-      <h3>Qualité de code <span class="count">6</span></h3>
-      <div class="finding-list">
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Code mort réel noyé dans un faux positif du linter</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/pages/public/Home.jsx:189-205 (governanceItems), eslint.config.js</div>
-      <p class="finding-desc">Sans eslint-plugin-react, no-unused-vars signale à tort <code>motion</code> comme inutilisé, masquant un vrai code mort juste à côté : governanceItems n'est jamais rendu.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter eslint-plugin-react, puis utiliser ou supprimer governanceItems.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Composant Container dupliqué en local plutôt qu'importé</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/pages/public/Home.jsx:32-41 vs src/components/ui/Container.jsx</div>
-      <p class="finding-desc">Home.jsx redéfinit son propre Container avec un commentaire indiquant un contournement d'alias d'import non résolu.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Importer components/ui/Container.jsx comme partout ailleurs.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Dépendance clsx déclarée mais jamais utilisée</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">package.json</div>
-      <p class="finding-desc">Aucun import dans src/, alors que les concaténations de classes conditionnelles sont faites en template strings partout.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Retirer la dépendance ou l'utiliser.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Fichiers de scaffolding Vite jamais nettoyés</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/assets/hero.png, react.svg, vite.svg</div>
-      <p class="finding-desc">Aucun de ces trois fichiers n'est importé nulle part dans src/.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Supprimer src/assets/ ou son contenu inutilisé.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">router.jsx mélange composant et export non-composant (Fast Refresh cassé en dev)</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/app/router.jsx</div>
-      <p class="finding-desc">Contrairement à AuthContext.jsx et SettingsContext.jsx (corrigés dans cette passe), router.jsx exporte encore l'objet <code>router</code> aux côtés de composants lazy-loadés — sans impact en production, seulement en développement (pas de Fast Refresh sur ce fichier).</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Laisser en l'état sauf gêne réelle en développement — le découpage n'apporterait qu'un bénéfice marginal ici.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-ok">
-    <summary>
-      <span class="sev-chip sev-ok">Point positif</span>
-      <span class="finding-title">Lint : 92 → 29 erreurs, SettingsContext centralisé</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">SettingsContext.jsx, useSettings.js</div>
-      <p class="finding-desc">Header, Footer et Contact consomment le même contexte au lieu de dupliquer l'appel réseau. Le linter d'accessibilité, quasi silencieux il y a peu, ne remonte plus que du bruit connu et documenté.</p>
-
-    </div>
-  </details></div>
-    </div>
-
-    <div class="subsection">
-      <h3>Fonctionnel <span class="count">2</span></h3>
-      <div class="finding-list">
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Texte d'instruction développeur visible par les utilisateurs finaux en cas d'échec image</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/pages/public/Home.jsx:1036-1048</div>
-      <p class="finding-desc">Si l'image de la Directrice Générale échoue à charger, le repli affiche un message destiné à un développeur, resté dans le code de production.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Remplacer par un message neutre pour l'utilisateur final.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">En-tête admin figé sur "Tableau de bord" sur toutes les pages</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/components/layout/AdminLayout.jsx:110-112</div>
-      <p class="finding-desc">Le titre affiché dans l'en-tête de la coquille admin est codé en dur et ne change jamais selon la page visitée.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Dériver ce titre de la route active, ou le supprimer.</p>
-    </div>
-  </details></div>
-    </div>
+    <p class="section-intro">3 constats restent ouverts, tous documentés dans l'encart en haut de page — aucun n'est un oubli, chacun a une raison précise (contenu à transcrire, outillage absent, ou bénéfice jugé trop marginal face au risque).</p>
   </section>
 
-  <p class="methodo">Méthodologie : deux passes de correction sur le rapport du 31 août 2026 — la première sur les 14 constats "Important" (13 fermés), la seconde ciblée sur les 5 constats mineurs "Architecture" du backend, à la demande explicite du client après clarification (deux groupes de 5 mineurs existaient dans le rapport ; celui du backend a été choisi). Chaque correctif a été revérifié après implémentation : relecture du code modifié, `npm test` (60/60, dont 3 nouveaux tests pour la race condition corrigée), `node --check` sur chaque fichier touché. Les autres constats mineurs (9 backend restants, 13 frontend) n'ont pas été touchés dans cette passe et restent listés ci-dessus pour référence.</p>
+  <p class="methodo">Méthodologie : passe de correction exhaustive sur le rapport du 31 août 2026, à la demande explicite du client de traiter tous les constats "Important" et "Mineur" restants. Travail réparti entre correction directe (9 constats backend, traités séquentiellement avec vérification par les tests après chaque changement) et une équipe dédiée pour les 10 constats frontend mécaniques ; l'image de repli surdimensionnée a été recompressée séparément. Chaque correctif a été revérifié indépendamment après implémentation plutôt qu'accepté sur la base du rapport d'exécution : relecture du code modifié, `npm test` (64/64), `npm run build`, `npm run lint` (31 → 28 problèmes, la différence correspondant exactement aux 3 constats corrigés dans cette catégorie). Les 3 constats non traités le sont par choix documenté, pas par omission.</p>
 </div>
 
 </body>

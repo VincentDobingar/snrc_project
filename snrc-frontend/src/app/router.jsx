@@ -1,36 +1,31 @@
-import { lazy } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import PublicLayout from "../components/layout/PublicLayout";
 import AdminLayout from "../components/layout/AdminLayout";
-
-const Home = lazy(() => import("../pages/public/Home"));
-const About = lazy(() => import("../pages/public/About"));
-const Missions = lazy(() => import("../pages/public/Missions"));
-const Services = lazy(() => import("../pages/public/Services"));
-const NewsList = lazy(() => import("../pages/public/NewsList"));
-const NewsDetail = lazy(() => import("../pages/public/NewsDetail"));
-const Publications = lazy(() => import("../pages/public/Publications"));
-const Jobs = lazy(() => import("../pages/public/Jobs"));
-const JobDetail = lazy(() => import("../pages/public/JobDetail"));
-const FAQ = lazy(() => import("../pages/public/FAQ"));
-const Contact = lazy(() => import("../pages/public/Contact"));
-const NotFound = lazy(() => import("../pages/public/NotFound"));
-
-const Login = lazy(() => import("../pages/admin/Login"));
-const Dashboard = lazy(() => import("../pages/admin/Dashboard"));
-const PagesManager = lazy(() => import("../pages/admin/PagesManager"));
-const NewsManager = lazy(() => import("../pages/admin/NewsManager"));
-const PublicationsManager = lazy(() =>
-  import("../pages/admin/PublicationsManager")
-);
-const FAQManager = lazy(() => import("../pages/admin/FAQManager"));
-const AdminUsersManager = lazy(() => import("../pages/admin/AdminUsersManager"));
-const SettingsManager = lazy(() => import("../pages/admin/SettingsManager"));
-const MessagesManager = lazy(() => import("../pages/admin/MessagesManager"));
-const JobsManager = lazy(() => import("../pages/admin/JobsManager"));
-const JobApplicationsManager = lazy(() =>
-  import("../pages/admin/JobApplicationsManager")
-);
+import {
+  Home,
+  About,
+  Missions,
+  Services,
+  NewsList,
+  NewsDetail,
+  Publications,
+  Jobs,
+  JobDetail,
+  FAQ,
+  Contact,
+  NotFound,
+  Login,
+  Dashboard,
+  PagesManager,
+  NewsManager,
+  PublicationsManager,
+  FAQManager,
+  AdminUsersManager,
+  SettingsManager,
+  MessagesManager,
+  JobsManager,
+  JobApplicationsManager,
+} from "./lazyPages";
 
 import ProtectedRoute from "../routes/ProtectedRoute";
 import GuestRoute from "../routes/GuestRoute";

@@ -1,6 +1,7 @@
 import slugify from "slugify";
 import { PagesModel } from "../models/pages.model.js";
 import { ok } from "../utils/apiResponse.js";
+import { parsePagination } from "../utils/pagination.js";
 
 const makeSlug = (value) => slugify(value || "page", { lower: true, strict: true, trim: true });
 
@@ -14,9 +15,10 @@ export const PagesController = {
     }
     return ok(res, "Page récupérée avec succès", { page });
   },
-  async getAll(_req, res) {
-    const pages = await PagesModel.listAll();
-    return ok(res, "Pages récupérées avec succès", { pages });
+  async getAll(req, res) {
+    const { limit, offset } = parsePagination(req.query);
+    const { rows: pages, total } = await PagesModel.listAll({ limit, offset });
+    return ok(res, "Pages récupérées avec succès", { pages, total, limit, offset });
   },
   async create(req, res) {
     const page = await PagesModel.create({

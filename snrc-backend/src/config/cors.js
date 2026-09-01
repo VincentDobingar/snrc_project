@@ -1,19 +1,5 @@
 // src/config/cors.js
-
-const defaultAllowedOrigins = [
-  "https://snrc.td",
-  "https://www.snrc.td",
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-];
-
-const envAllowedOrigins = (process.env.ALLOWED_ORIGINS || "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
-const allowedOrigins =
-  envAllowedOrigins.length > 0 ? envAllowedOrigins : defaultAllowedOrigins;
+import { env } from "./env.js";
 
 export const corsOptions = {
   origin(origin, callback) {
@@ -22,12 +8,12 @@ export const corsOptions = {
       return callback(null, true);
     }
 
-    if (allowedOrigins.includes(origin)) {
+    if (env.ALLOWED_ORIGINS.includes(origin)) {
       return callback(null, true);
     }
 
     console.warn("❌ Origin CORS refusée :", origin);
-    console.warn("✅ Origins autorisées :", allowedOrigins);
+    console.warn("✅ Origins autorisées :", env.ALLOWED_ORIGINS);
 
     return callback(new Error(`Origin CORS non autorisée : ${origin}`));
   },

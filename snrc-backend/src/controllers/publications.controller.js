@@ -1,6 +1,7 @@
 import slugify from "slugify";
 import { PublicationsModel } from "../models/publications.model.js";
 import { ok } from "../utils/apiResponse.js";
+import { parsePagination } from "../utils/pagination.js";
 
 const makeSlug = (value) => slugify(value || "publication", { lower: true, strict: true, trim: true });
 
@@ -22,9 +23,10 @@ export const PublicationsController = {
     const categories = await PublicationsModel.listCategories();
     return ok(res, "Catégories récupérées avec succès", { categories });
   },
-  async getAll(_req, res) {
-    const publications = await PublicationsModel.listAll();
-    return ok(res, "Publications récupérées avec succès", { publications });
+  async getAll(req, res) {
+    const { limit, offset } = parsePagination(req.query);
+    const { rows: publications, total } = await PublicationsModel.listAll({ limit, offset });
+    return ok(res, "Publications récupérées avec succès", { publications, total, limit, offset });
   },
   async create(req, res, next) {
     const file_url = req.body.file_url;

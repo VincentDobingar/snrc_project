@@ -5,9 +5,15 @@ export const ServicesModel = {
     const result = await query(`SELECT * FROM services WHERE status='published' ORDER BY display_order ASC, id DESC`);
     return result.rows;
   },
-  async listAll() {
-    const result = await query(`SELECT * FROM services ORDER BY display_order ASC, id DESC`);
-    return result.rows;
+  async listAll({ limit = 50, offset = 0 } = {}) {
+    const [result, countResult] = await Promise.all([
+      query(
+        `SELECT * FROM services ORDER BY display_order ASC, id DESC LIMIT $1 OFFSET $2`,
+        [limit, offset]
+      ),
+      query(`SELECT COUNT(*)::int AS count FROM services`),
+    ]);
+    return { rows: result.rows, total: countResult.rows[0].count };
   },
   async findById(id) {
     const result = await query(`SELECT * FROM services WHERE id=$1 LIMIT 1`, [id]);

@@ -9,9 +9,15 @@ export const NewsModel = {
     );
     return result.rows;
   },
-  async listAll() {
-    const result = await query(`SELECT * FROM news ORDER BY COALESCE(published_at, created_at) DESC`);
-    return result.rows;
+  async listAll({ limit = 50, offset = 0 } = {}) {
+    const [result, countResult] = await Promise.all([
+      query(
+        `SELECT * FROM news ORDER BY COALESCE(published_at, created_at) DESC LIMIT $1 OFFSET $2`,
+        [limit, offset]
+      ),
+      query(`SELECT COUNT(*)::int AS count FROM news`),
+    ]);
+    return { rows: result.rows, total: countResult.rows[0].count };
   },
   async findBySlug(slug) {
     const result = await query(`SELECT * FROM news WHERE slug=$1 AND status='published' LIMIT 1`, [slug]);

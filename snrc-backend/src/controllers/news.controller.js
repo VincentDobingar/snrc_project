@@ -1,6 +1,7 @@
 import slugify from "slugify";
 import { NewsModel } from "../models/news.model.js";
 import { ok } from "../utils/apiResponse.js";
+import { parsePagination } from "../utils/pagination.js";
 
 const makeSlug = (value) => slugify(value || "actualite", { lower: true, strict: true, trim: true });
 
@@ -20,9 +21,10 @@ export const NewsController = {
     }
     return ok(res, "Actualité récupérée avec succès", { news: item });
   },
-  async getAll(_req, res) {
-    const news = await NewsModel.listAll();
-    return ok(res, "Actualités récupérées avec succès", { news });
+  async getAll(req, res) {
+    const { limit, offset } = parsePagination(req.query);
+    const { rows: news, total } = await NewsModel.listAll({ limit, offset });
+    return ok(res, "Actualités récupérées avec succès", { news, total, limit, offset });
   },
   async create(req, res) {
     const isPublished = req.body.status === "published";

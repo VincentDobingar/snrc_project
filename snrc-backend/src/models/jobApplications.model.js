@@ -1,14 +1,18 @@
 import { query } from "../config/db.js";
 
 export const JobApplicationsModel = {
-  async listAll() {
-    const result = await query(
-      `SELECT a.*, j.title AS job_title, j.slug AS job_slug
-       FROM job_applications a
-       JOIN job_offers j ON j.id = a.job_offer_id
-       ORDER BY a.created_at DESC`
-    );
-    return result.rows;
+  async listAll({ limit = 50, offset = 0 } = {}) {
+    const [result, countResult] = await Promise.all([
+      query(
+        `SELECT a.*, j.title AS job_title, j.slug AS job_slug
+         FROM job_applications a
+         JOIN job_offers j ON j.id = a.job_offer_id
+         ORDER BY a.created_at DESC LIMIT $1 OFFSET $2`,
+        [limit, offset]
+      ),
+      query(`SELECT COUNT(*)::int AS count FROM job_applications`),
+    ]);
+    return { rows: result.rows, total: countResult.rows[0].count };
   },
   async findById(id) {
     const result = await query(

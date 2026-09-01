@@ -1,14 +1,16 @@
 import { MessagesModel } from "../models/messages.model.js";
 import { ok } from "../utils/apiResponse.js";
+import { parsePagination } from "../utils/pagination.js";
 
 export const MessagesController = {
   async contact(req, res) {
     const message = await MessagesModel.create(req.body);
     return ok(res, "Message envoyé avec succès", { message }, 201);
   },
-  async getAll(_req, res) {
-    const messages = await MessagesModel.listAll();
-    return ok(res, "Messages récupérés avec succès", { messages });
+  async getAll(req, res) {
+    const { limit, offset } = parsePagination(req.query);
+    const { rows: messages, total } = await MessagesModel.listAll({ limit, offset });
+    return ok(res, "Messages récupérés avec succès", { messages, total, limit, offset });
   },
   async getById(req, res, next) {
     const message = await MessagesModel.findById(req.params.id);

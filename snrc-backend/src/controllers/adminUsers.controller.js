@@ -2,11 +2,13 @@ import bcrypt from "bcryptjs";
 import { AdminUsersModel } from "../models/adminUsers.model.js";
 import { AuthModel } from "../models/auth.model.js";
 import { ok } from "../utils/apiResponse.js";
+import { parsePagination } from "../utils/pagination.js";
 
 export const AdminUsersController = {
-  async getAll(_req, res) {
-    const users = await AdminUsersModel.listAll();
-    return ok(res, "Administrateurs récupérés avec succès", { users });
+  async getAll(req, res) {
+    const { limit, offset } = parsePagination(req.query);
+    const { rows: users, total } = await AdminUsersModel.listAll({ limit, offset });
+    return ok(res, "Administrateurs récupérés avec succès", { users, total, limit, offset });
   },
   async create(req, res, next) {
     const existing = await AuthModel.findByEmail(req.body.email);
@@ -39,28 +41,33 @@ export const AdminUsersController = {
     const newRole = req.body.role ?? existing.role;
     const newStatus = req.body.status ?? existing.status;
     // Garde-fou "dernier superadmin actif" : ne s'applique que lorsque la cible
-    // est elle-même superadmin et qu'on la désactive/rétrograde.
+    // est elle-même superadmin et qu'on la désactive/rétrograde. La vérification
+    // et l'UPDATE s'exécutent dans une seule transaction (updateWithGuard) pour
+    // éviter la race condition où deux requêtes concurrentes désactivant deux
+    // superadmins différents pouvaient chacune lire "il en reste un autre".
     const lastSuperadminGuardApplies =
       existing.role === "superadmin" && (newStatus === "inactive" || newRole !== "superadmin");
-    if (lastSuperadminGuardApplies) {
-      const activeCount = await AdminUsersModel.countActiveSuperadmins(existing.id);
-      if (activeCount === 0) {
-        const error = new Error("Impossible de désactiver/supprimer le dernier superadministrateur actif");
-        error.status = 400;
-        return next(error);
-      }
-    }
     // Révocation des sessions déjà émises (bump token_version) : toute
     // désactivation, quel que soit le rôle, ainsi que la rétrogradation d'un
     // superadmin, doivent invalider immédiatement les JWT déjà en circulation
     // (requireAuth ne vérifie pas admins.status, seulement token_version).
     const revokesSecurity = newStatus === "inactive" || (existing.role === "superadmin" && newRole !== "superadmin");
-    const user = await AdminUsersModel.update(req.params.id, {
-      full_name: req.body.full_name ?? existing.full_name,
-      email: req.body.email ?? existing.email,
-      role: newRole,
-      status: newStatus,
-    });
+
+    let user;
+    try {
+      user = await AdminUsersModel.updateWithGuard(
+        req.params.id,
+        {
+          full_name: req.body.full_name ?? existing.full_name,
+          email: req.body.email ?? existing.email,
+          role: newRole,
+          status: newStatus,
+        },
+        { guardLastSuperadmin: lastSuperadminGuardApplies }
+      );
+    } catch (error) {
+      return next(error);
+    }
     if (revokesSecurity) {
       await AdminUsersModel.bumpTokenVersion(req.params.id);
     }
@@ -84,15 +91,14 @@ export const AdminUsersController = {
       error.status = 404;
       return next(error);
     }
-    if (existing.role === "superadmin") {
-      const activeCount = await AdminUsersModel.countActiveSuperadmins(existing.id);
-      if (activeCount === 0) {
-        const error = new Error("Impossible de désactiver/supprimer le dernier superadministrateur actif");
-        error.status = 400;
-        return next(error);
-      }
+    let deleted;
+    try {
+      deleted = await AdminUsersModel.removeWithGuard(req.params.id, {
+        guardLastSuperadmin: existing.role === "superadmin",
+      });
+    } catch (error) {
+      return next(error);
     }
-    const deleted = await AdminUsersModel.remove(req.params.id);
     if (!deleted) {
       const error = new Error("Administrateur introuvable");
       error.status = 404;

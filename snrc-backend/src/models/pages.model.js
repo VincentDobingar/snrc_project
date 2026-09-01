@@ -1,9 +1,12 @@
 import { query } from "../config/db.js";
 
 export const PagesModel = {
-  async listAll() {
-    const result = await query(`SELECT * FROM pages ORDER BY id DESC`);
-    return result.rows;
+  async listAll({ limit = 50, offset = 0 } = {}) {
+    const [result, countResult] = await Promise.all([
+      query(`SELECT * FROM pages ORDER BY id DESC LIMIT $1 OFFSET $2`, [limit, offset]),
+      query(`SELECT COUNT(*)::int AS count FROM pages`),
+    ]);
+    return { rows: result.rows, total: countResult.rows[0].count };
   },
   async findById(id) {
     const result = await query(`SELECT * FROM pages WHERE id = $1 LIMIT 1`, [id]);

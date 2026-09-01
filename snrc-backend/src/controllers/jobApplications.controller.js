@@ -3,6 +3,7 @@ import { JobApplicationsModel } from "../models/jobApplications.model.js";
 import { ok } from "../utils/apiResponse.js";
 import { DOCUMENT_MIME_TYPES } from "../middlewares/upload.js";
 import { verifyUploadedFilesContent } from "../middlewares/verifyFileContent.js";
+import { parsePagination } from "../utils/pagination.js";
 
 export const JobApplicationsController = {
   async apply(req, res, next) {
@@ -41,9 +42,10 @@ export const JobApplicationsController = {
 
     return ok(res, "Candidature envoyée avec succès", { application }, 201);
   },
-  async getAll(_req, res) {
-    const applications = await JobApplicationsModel.listAll();
-    return ok(res, "Candidatures récupérées avec succès", { applications });
+  async getAll(req, res) {
+    const { limit, offset } = parsePagination(req.query);
+    const { rows: applications, total } = await JobApplicationsModel.listAll({ limit, offset });
+    return ok(res, "Candidatures récupérées avec succès", { applications, total, limit, offset });
   },
   async getById(req, res, next) {
     const application = await JobApplicationsModel.findById(req.params.id);

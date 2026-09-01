@@ -1,14 +1,16 @@
 import { FAQModel } from "../models/faq.model.js";
 import { ok } from "../utils/apiResponse.js";
+import { parsePagination } from "../utils/pagination.js";
 
 export const FAQController = {
   async getPublic(_req, res) {
     const faqs = await FAQModel.listPublic();
     return ok(res, "FAQ récupérées avec succès", { faqs });
   },
-  async getAll(_req, res) {
-    const faqs = await FAQModel.listAll();
-    return ok(res, "FAQ récupérées avec succès", { faqs });
+  async getAll(req, res) {
+    const { limit, offset } = parsePagination(req.query);
+    const { rows: faqs, total } = await FAQModel.listAll({ limit, offset });
+    return ok(res, "FAQ récupérées avec succès", { faqs, total, limit, offset });
   },
   async create(req, res) {
     const faq = await FAQModel.create(req.body);

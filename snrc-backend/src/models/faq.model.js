@@ -5,9 +5,15 @@ export const FAQModel = {
     const result = await query(`SELECT * FROM faqs WHERE status='active' ORDER BY display_order ASC, id DESC`);
     return result.rows;
   },
-  async listAll() {
-    const result = await query(`SELECT * FROM faqs ORDER BY display_order ASC, id DESC`);
-    return result.rows;
+  async listAll({ limit = 50, offset = 0 } = {}) {
+    const [result, countResult] = await Promise.all([
+      query(
+        `SELECT * FROM faqs ORDER BY display_order ASC, id DESC LIMIT $1 OFFSET $2`,
+        [limit, offset]
+      ),
+      query(`SELECT COUNT(*)::int AS count FROM faqs`),
+    ]);
+    return { rows: result.rows, total: countResult.rows[0].count };
   },
   async findById(id) {
     const result = await query(`SELECT * FROM faqs WHERE id=$1 LIMIT 1`, [id]);

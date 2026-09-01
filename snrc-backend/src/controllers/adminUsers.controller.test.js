@@ -25,22 +25,20 @@ const adminUsersMock = {
   listAll: vi.fn(),
   findRawById: vi.fn(),
   create: vi.fn(),
-  update: vi.fn(),
+  updateWithGuard: vi.fn(),
   updatePassword: vi.fn(),
-  remove: vi.fn(),
+  removeWithGuard: vi.fn(),
   bumpTokenVersion: vi.fn(),
-  countActiveSuperadmins: vi.fn(),
 };
 vi.mock("../models/adminUsers.model.js", () => ({
   AdminUsersModel: {
     listAll: (...a) => adminUsersMock.listAll(...a),
     findRawById: (...a) => adminUsersMock.findRawById(...a),
     create: (...a) => adminUsersMock.create(...a),
-    update: (...a) => adminUsersMock.update(...a),
+    updateWithGuard: (...a) => adminUsersMock.updateWithGuard(...a),
     updatePassword: (...a) => adminUsersMock.updatePassword(...a),
-    remove: (...a) => adminUsersMock.remove(...a),
+    removeWithGuard: (...a) => adminUsersMock.removeWithGuard(...a),
     bumpTokenVersion: (...a) => adminUsersMock.bumpTokenVersion(...a),
-    countActiveSuperadmins: (...a) => adminUsersMock.countActiveSuperadmins(...a),
   },
 }));
 
@@ -100,7 +98,7 @@ describe("PUT /api/admin/users/:id — token revocation on status/role change", 
     const staleToken = signToken(editeur); // issued while still active
 
     adminUsersMock.findRawById.mockResolvedValue(editeur);
-    adminUsersMock.update.mockResolvedValue({ ...editeur, status: "inactive" });
+    adminUsersMock.updateWithGuard.mockResolvedValue({ ...editeur, status: "inactive" });
     adminUsersMock.bumpTokenVersion.mockResolvedValue({ id: editeur.id, token_version: editeur.token_version + 1 });
 
     const superadminToken = signToken(SUPERADMIN);
@@ -111,8 +109,14 @@ describe("PUT /api/admin/users/:id — token revocation on status/role change", 
 
     expect(res.status).toBe(200);
     expect(adminUsersMock.bumpTokenVersion).toHaveBeenCalledWith(String(editeur.id));
-    // The last-active-superadmin guard must not fire for a non-superadmin target.
-    expect(adminUsersMock.countActiveSuperadmins).not.toHaveBeenCalled();
+    // The last-active-superadmin guard (now enforced atomically inside
+    // updateWithGuard, see the model) must not be requested for a
+    // non-superadmin target.
+    expect(adminUsersMock.updateWithGuard).toHaveBeenCalledWith(
+      String(editeur.id),
+      expect.any(Object),
+      { guardLastSuperadmin: false }
+    );
 
     // Simulate the DB having actually applied the bump, then replay the
     // editeur's previously issued (now-stale) token — mirrors the
@@ -137,7 +141,7 @@ describe("PUT /api/admin/users/:id — token revocation on status/role change", 
       token_version: 2,
     };
     adminUsersMock.findRawById.mockResolvedValue(editeur);
-    adminUsersMock.update.mockResolvedValue({ ...editeur, full_name: "Editeur Renommé" });
+    adminUsersMock.updateWithGuard.mockResolvedValue({ ...editeur, full_name: "Editeur Renommé" });
 
     const superadminToken = signToken(SUPERADMIN);
     const res = await request(app)
@@ -152,7 +156,14 @@ describe("PUT /api/admin/users/:id — token revocation on status/role change", 
   it("still blocks deactivating the last active superadmin", async () => {
     const target = { ...SUPERADMIN, id: 5, token_version: 1 };
     adminUsersMock.findRawById.mockResolvedValue(target);
-    adminUsersMock.countActiveSuperadmins.mockResolvedValue(0); // no other active superadmin
+    // updateWithGuard now owns the "lock other active superadmins, reject if
+    // none remain" check atomically (see adminUsers.model.js) — simulate it
+    // rejecting exactly like the real transactional implementation would.
+    adminUsersMock.updateWithGuard.mockImplementation(() => {
+      const error = new Error("Impossible de désactiver/supprimer le dernier superadministrateur actif");
+      error.status = 400;
+      return Promise.reject(error);
+    });
 
     const superadminToken = signToken(SUPERADMIN);
     const res = await request(app)
@@ -161,15 +172,20 @@ describe("PUT /api/admin/users/:id — token revocation on status/role change", 
       .send({ status: "inactive" });
 
     expect(res.status).toBe(400);
-    expect(adminUsersMock.update).not.toHaveBeenCalled();
+    expect(adminUsersMock.updateWithGuard).toHaveBeenCalledWith(
+      String(target.id),
+      expect.any(Object),
+      { guardLastSuperadmin: true }
+    );
     expect(adminUsersMock.bumpTokenVersion).not.toHaveBeenCalled();
   });
 
   it("still bumps token_version when a superadmin is demoted to admin_editeur (regression check)", async () => {
     const target = { id: 6, full_name: "Superadmin 2", email: "s2@example.com", role: "superadmin", status: "active", token_version: 7 };
     adminUsersMock.findRawById.mockResolvedValue(target);
-    adminUsersMock.countActiveSuperadmins.mockResolvedValue(1); // another active superadmin exists
-    adminUsersMock.update.mockResolvedValue({ ...target, role: "admin_editeur" });
+    // Another active superadmin exists, so updateWithGuard's internal lock
+    // check succeeds and resolves normally.
+    adminUsersMock.updateWithGuard.mockResolvedValue({ ...target, role: "admin_editeur" });
     adminUsersMock.bumpTokenVersion.mockResolvedValue({ id: target.id, token_version: target.token_version + 1 });
 
     const superadminToken = signToken(SUPERADMIN);
@@ -179,6 +195,58 @@ describe("PUT /api/admin/users/:id — token revocation on status/role change", 
       .send({ role: "admin_editeur" });
 
     expect(res.status).toBe(200);
+    expect(adminUsersMock.updateWithGuard).toHaveBeenCalledWith(
+      String(target.id),
+      expect.any(Object),
+      { guardLastSuperadmin: true }
+    );
     expect(adminUsersMock.bumpTokenVersion).toHaveBeenCalledWith(String(target.id));
+  });
+});
+
+describe("DELETE /api/admin/users/:id — last-active-superadmin guard", () => {
+  it("blocks deleting the last active superadmin", async () => {
+    const target = { ...SUPERADMIN, id: 7, token_version: 1 };
+    adminUsersMock.findRawById.mockResolvedValue(target);
+    adminUsersMock.removeWithGuard.mockImplementation(() => {
+      const error = new Error("Impossible de désactiver/supprimer le dernier superadministrateur actif");
+      error.status = 400;
+      return Promise.reject(error);
+    });
+
+    const superadminToken = signToken(SUPERADMIN);
+    const res = await request(app)
+      .delete(`/api/admin/users/${target.id}`)
+      .set("Authorization", `Bearer ${superadminToken}`);
+
+    expect(res.status).toBe(400);
+    expect(adminUsersMock.removeWithGuard).toHaveBeenCalledWith(String(target.id), { guardLastSuperadmin: true });
+  });
+
+  it("allows deleting a superadmin when another active superadmin remains", async () => {
+    const target = { id: 8, full_name: "Superadmin 3", email: "s3@example.com", role: "superadmin", status: "active" };
+    adminUsersMock.findRawById.mockResolvedValue(target);
+    adminUsersMock.removeWithGuard.mockResolvedValue({ id: target.id });
+
+    const superadminToken = signToken(SUPERADMIN);
+    const res = await request(app)
+      .delete(`/api/admin/users/${target.id}`)
+      .set("Authorization", `Bearer ${superadminToken}`);
+
+    expect(res.status).toBe(200);
+  });
+
+  it("does not request the guard when deleting a non-superadmin", async () => {
+    const target = { id: 9, full_name: "Editeur", email: "e@example.com", role: "admin_editeur", status: "active" };
+    adminUsersMock.findRawById.mockResolvedValue(target);
+    adminUsersMock.removeWithGuard.mockResolvedValue({ id: target.id });
+
+    const superadminToken = signToken(SUPERADMIN);
+    const res = await request(app)
+      .delete(`/api/admin/users/${target.id}`)
+      .set("Authorization", `Bearer ${superadminToken}`);
+
+    expect(res.status).toBe(200);
+    expect(adminUsersMock.removeWithGuard).toHaveBeenCalledWith(String(target.id), { guardLastSuperadmin: false });
   });
 });

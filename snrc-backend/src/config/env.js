@@ -29,7 +29,13 @@ export const env = {
   NODE_ENV: required("NODE_ENV", "development"),
   APP_URL: required("APP_URL", "http://localhost:5173"),
   API_URL: required("API_URL", "http://localhost:5000"),
-  ALLOWED_ORIGINS: required("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:4173")
+  // Le fallback inclut les domaines de production pour que le comportement
+  // reste correct même si ALLOWED_ORIGINS n'est pas défini en .env (au lieu
+  // de dépendre d'une seconde liste de secours dupliquée dans cors.js).
+  ALLOWED_ORIGINS: required(
+    "ALLOWED_ORIGINS",
+    "https://snrc.td,https://www.snrc.td,http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173"
+  )
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean),

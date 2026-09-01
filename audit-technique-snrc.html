@@ -232,14 +232,14 @@
 <body>
 <div class="masthead">
   <div class="masthead-inner">
-    <p class="eyebrow">SNRC · Tchad — Audit technique du site institutionnel — Correctifs "Important"</p>
-    <h1>13 des 14 constats importants corrigés — un seul reste, par choix</h1>
-    <p class="lede">Suite directe de la cinquième lecture d'audit : chaque constat classé "Important" a été traité individuellement, corrigé dans le code, puis revérifié (tests, build, lint, et une inspection manuelle des points les plus sensibles). Une régression a été détectée et corrigée pendant ce travail même — les fichiers de Publications, hébergés dans le même dossier que les CV de candidature, auraient sinon perdu leur accès public en corrigeant l'un et en cassant l'autre.</p>
+    <p class="eyebrow">SNRC · Tchad — Audit technique du site institutionnel — Correctifs backend Architecture</p>
+    <h1>Les 5 constats mineurs "Architecture" du backend sont corrigés</h1>
+    <p class="lede">Sixième passe : les 5 constats mineurs regroupés sous "Architecture" côté backend ont été corrigés — race condition sur le garde-fou du dernier superadmin, pagination sur les 9 listes admin, filet de sécurité process-level, déduplication de la logique CORS, et erreurs HTTP correctement typées pour les uploads. Chaque correctif revérifié : 60/60 tests passants (3 nouveaux ajoutés pour la race condition corrigée).</p>
     <div class="stat-row">
       <div class="stat crit"><div class="num">0</div><div class="lbl">critique</div></div>
       <div class="stat imp"><div class="num">1</div><div class="lbl">important restant</div></div>
-      <div class="stat min"><div class="num">27</div><div class="lbl">mineurs (inchangé)</div></div>
-      <div class="stat"><div class="num">13</div><div class="lbl">constats corrigés</div></div>
+      <div class="stat min"><div class="num">22</div><div class="lbl">mineurs restants</div></div>
+      <div class="stat"><div class="num">18</div><div class="lbl">constats corrigés au total</div></div>
     </div>
   </div>
 </div>
@@ -252,8 +252,20 @@
   </div>
 
   <div class="fixed-box">
-    <h3>Corrigé dans cette passe <span style="color:var(--ink-faint); font-weight:500; font-size:13px;">— 13 constats importants fermés</span></h3>
-    <p class="section-intro">Chaque correctif a été revérifié après coup : relecture du code modifié, `npm test`/`npm run lint`/`npm run build` exécutés, et pour le point le plus délicat (accès aux documents), un test out reproduisant exactement le scénario a été ajouté.</p>
+    <h3>Corrigé au total <span style="color:var(--ink-faint); font-weight:500; font-size:13px;">— 18 constats fermés en deux passes</span></h3>
+    <p class="section-intro">13 constats importants (passe précédente) + 5 constats mineurs "Architecture" backend (cette passe). Chaque correctif a été revérifié après coup : relecture du code modifié, `npm test`/`npm run lint`/`npm run build` exécutés.</p>
+    <ul>
+      <li><span class="fixed-tag">Backend</span>Le garde-fou "dernier superadmin actif" verrouille désormais (SELECT ... FOR UPDATE) et met à jour dans la même transaction — la race condition permettant de désactiver les deux derniers superadmins en simultané n'existe plus.</li>
+      <li><span class="fixed-tag">Backend</span>Pagination limit/offset ajoutée sur les 9 listes admin (pages, actualités, services, publications, FAQ, messages, candidatures, offres, administrateurs), avec un total renvoyé pour chacune.</li>
+      <li><span class="fixed-tag">Backend</span><code>server.js</code> gère désormais unhandledRejection/uncaughtException et ferme proprement le pool PostgreSQL sur SIGTERM/SIGINT.</li>
+      <li><span class="fixed-tag">Backend</span>cors.js ne reparse plus <code>ALLOWED_ORIGINS</code> indépendamment — une seule source de vérité dans <code>env.js</code>, dont le fallback inclut désormais les domaines de production.</li>
+      <li><span class="fixed-tag">Backend</span>Les erreurs de type de fichier renvoient 400 (au lieu de 500), et les erreurs Multer (fichier trop volumineux, etc.) sont mappées vers les codes HTTP appropriés (413/400).</li>
+    </ul>
+  </div>
+
+  <div class="fixed-box">
+    <h3>Corrigé — passe précédente <span style="color:var(--ink-faint); font-weight:500; font-size:13px;">— 13 constats importants fermés</span></h3>
+    <p class="section-intro">Pour référence : le détail de la passe précédente, qui avait fermé 13 des 14 constats "Important".</p>
     <ul>
       <li><span class="fixed-tag">Backend</span>Désactiver un compte <code>admin_editeur</code> révoque désormais bien sa session (le correctif précédent ne couvrait que les superadmins).</li>
       <li><span class="fixed-tag">Backend</span>CV et lettres de motivation protégés par authentification — <strong>avec une exception vérifiée en base</strong> pour ne pas casser l'accès public aux fichiers de Publications, qui partageaient le même dossier physique.</li>
@@ -282,10 +294,10 @@
       <div class="side-head-counts">
         <span class="sev-chip sev-crit">0</span>
         <span class="sev-chip sev-imp">0</span>
-        <span class="sev-chip sev-min">14</span>
+        <span class="sev-chip sev-min">9</span>
       </div>
     </div>
-    <p class="section-intro">Les 5 constats "Important" du backend sont tous corrigés (voir encart ci-dessus). Seuls les 14 constats mineurs de la dernière lecture restent ouverts, inchangés — non traités dans cette passe, qui ciblait spécifiquement les constats importants.</p>
+    <p class="section-intro">Les 5 constats "Important" et les 5 constats "Architecture" du backend sont tous corrigés (voir encarts ci-dessus). Restent 9 constats mineurs répartis sur Sécurité, Fonctionnel et Dette technique — non ciblés par ces deux dernières passes.</p>
 
     <div class="subsection">
       <h3>Sécurité <span class="count">3</span></h3>
@@ -323,70 +335,6 @@
       <div class="finding-ref">src/middlewares/sanitizeHtmlFields.js:5-14</div>
       <p class="finding-desc">Un contenu admin peut injecter du CSS arbitraire sans exécuter de script, avec un risque de défiguration/spoofing visuel si un compte éditeur est compromis.</p>
       <p class="finding-reco"><span class="reco-label">Recommandation —</span> Restreindre <code>style</code> à une liste blanche de propriétés via <code>allowedStyles</code>.</p>
-    </div>
-  </details></div>
-    </div>
-
-    <div class="subsection">
-      <h3>Architecture <span class="count">5</span></h3>
-      <div class="finding-list">
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Race condition (TOCTOU) sur le garde-fou "dernier superadmin actif"</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/controllers/adminUsers.controller.js:41-49,79-86</div>
-      <p class="finding-desc">Le contrôle exécute un SELECT COUNT(*) séparé de l'UPDATE/DELETE, sans transaction ni verrou.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Encapsuler la vérification et l'action dans une transaction avec <code>SELECT ... FOR UPDATE</code>.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Aucune pagination sur les listes admin</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/models/news.model.js, jobApplications.model.js, messages.model.js, adminUsers.model.js</div>
-      <p class="finding-desc">Tous les endpoints /admin/* renvoient la table entière en une seule réponse.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter une pagination limit/offset sur tous les listings admin.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Pas de filet de sécurité au niveau du process</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/server.js</div>
-      <p class="finding-desc">Aucun handler unhandledRejection/uncaughtException, aucun arrêt propre du pool PG/serveur HTTP sur SIGTERM.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Ajouter ces handlers.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Duplication de la logique de parsing d'ALLOWED_ORIGINS</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/config/cors.js:10-16, src/config/env.js:32-35</div>
-      <p class="finding-desc">cors.js reparse la variable indépendamment au lieu de réutiliser <code>env.ALLOWED_ORIGINS</code> déjà calculé.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Faire importer <code>env.ALLOWED_ORIGINS</code> par cors.js.</p>
-    </div>
-  </details>
-
-  <details class="finding sev-min">
-    <summary>
-      <span class="sev-chip sev-min">Mineur</span>
-      <span class="finding-title">Erreurs 500 génériques pour des erreurs client attendues</span>
-    </summary>
-    <div class="finding-body">
-      <div class="finding-ref">src/middlewares/errorHandler.js, src/middlewares/upload.js:38</div>
-      <p class="finding-desc">L'erreur de fileFilter n'a pas de <code>.status</code>, donc errorHandler renvoie un 500 pour un simple mauvais type de fichier.</p>
-      <p class="finding-reco"><span class="reco-label">Recommandation —</span> Fixer <code>.status = 400</code> et ajouter un middleware dédié aux erreurs Multer.</p>
     </div>
   </details></div>
     </div>
@@ -712,7 +660,7 @@
     </div>
   </section>
 
-  <p class="methodo">Méthodologie : passe de correction ciblée sur les 14 constats "Important" de la lecture du 31 août 2026, menée par deux équipes de travail séparées (backend / frontend) travaillant à partir de chaque constat vérifié individuellement. Un conflit non anticipé (documents de Publications vs candidatures partageant un même dossier) a été détecté par l'équipe backend elle-même pendant l'implémentation, signalé clairement plutôt que masqué, puis corrigé séparément par vérification en base de données avant intégration. Chaque correctif a ensuite été revérifié indépendamment : relecture du code modifié, `npm test` (57/57), `npm run build`, `npm run lint`, et une vérification empirique du sitemap généré contre le contenu réellement publié en production. Les 27 constats mineurs de la lecture précédente n'ont pas été touchés dans cette passe et restent listés ci-dessus pour référence.</p>
+  <p class="methodo">Méthodologie : deux passes de correction sur le rapport du 31 août 2026 — la première sur les 14 constats "Important" (13 fermés), la seconde ciblée sur les 5 constats mineurs "Architecture" du backend, à la demande explicite du client après clarification (deux groupes de 5 mineurs existaient dans le rapport ; celui du backend a été choisi). Chaque correctif a été revérifié après implémentation : relecture du code modifié, `npm test` (60/60, dont 3 nouveaux tests pour la race condition corrigée), `node --check` sur chaque fichier touché. Les autres constats mineurs (9 backend restants, 13 frontend) n'ont pas été touchés dans cette passe et restent listés ci-dessus pour référence.</p>
 </div>
 
 </body>

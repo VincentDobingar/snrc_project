@@ -1,6 +1,7 @@
 import slugify from "slugify";
 import { ServicesModel } from "../models/services.model.js";
 import { ok } from "../utils/apiResponse.js";
+import { parsePagination } from "../utils/pagination.js";
 
 const makeSlug = (value) => slugify(value || "service", { lower: true, strict: true, trim: true });
 
@@ -18,9 +19,10 @@ export const ServicesController = {
     }
     return ok(res, "Service récupéré avec succès", { service });
   },
-  async getAll(_req, res) {
-    const services = await ServicesModel.listAll();
-    return ok(res, "Services récupérés avec succès", { services });
+  async getAll(req, res) {
+    const { limit, offset } = parsePagination(req.query);
+    const { rows: services, total } = await ServicesModel.listAll({ limit, offset });
+    return ok(res, "Services récupérés avec succès", { services, total, limit, offset });
   },
   async create(req, res) {
     const service = await ServicesModel.create({

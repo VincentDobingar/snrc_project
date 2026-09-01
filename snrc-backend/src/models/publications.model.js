@@ -11,14 +11,18 @@ export const PublicationsModel = {
     );
     return result.rows;
   },
-  async listAll() {
-    const result = await query(
-      `SELECT p.*, c.name AS category_name
-       FROM publications p
-       LEFT JOIN publication_categories c ON c.id = p.category_id
-       ORDER BY COALESCE(p.published_at, p.created_at) DESC`
-    );
-    return result.rows;
+  async listAll({ limit = 50, offset = 0 } = {}) {
+    const [result, countResult] = await Promise.all([
+      query(
+        `SELECT p.*, c.name AS category_name
+         FROM publications p
+         LEFT JOIN publication_categories c ON c.id = p.category_id
+         ORDER BY COALESCE(p.published_at, p.created_at) DESC LIMIT $1 OFFSET $2`,
+        [limit, offset]
+      ),
+      query(`SELECT COUNT(*)::int AS count FROM publications`),
+    ]);
+    return { rows: result.rows, total: countResult.rows[0].count };
   },
   async findById(id) {
     const result = await query(`SELECT * FROM publications WHERE id=$1 LIMIT 1`, [id]);

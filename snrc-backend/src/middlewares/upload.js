@@ -35,7 +35,9 @@ export function buildFileFilter(allowedMimeTypes = [], allowedExtensions = []) {
     const ext = path.extname(file.originalname).toLowerCase();
     const okExt = allowedExtensions.includes(ext);
     if (okType && okExt) return cb(null, true);
-    return cb(new Error("Unsupported file type"));
+    const error = new Error("Type de fichier non autorisé");
+    error.status = 400;
+    return cb(error);
   };
 }
 

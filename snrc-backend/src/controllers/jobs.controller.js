@@ -1,6 +1,7 @@
 import slugify from "slugify";
 import { JobOffersModel } from "../models/jobs.model.js";
 import { ok } from "../utils/apiResponse.js";
+import { parsePagination } from "../utils/pagination.js";
 
 const makeSlug = (value) => slugify(value || "offre-emploi", { lower: true, strict: true, trim: true });
 
@@ -18,9 +19,10 @@ export const JobsController = {
     }
     return ok(res, "Offre d'emploi récupérée avec succès", { job });
   },
-  async getAll(_req, res) {
-    const jobs = await JobOffersModel.listAll();
-    return ok(res, "Offres d'emploi récupérées avec succès", { jobs });
+  async getAll(req, res) {
+    const { limit, offset } = parsePagination(req.query);
+    const { rows: jobs, total } = await JobOffersModel.listAll({ limit, offset });
+    return ok(res, "Offres d'emploi récupérées avec succès", { jobs, total, limit, offset });
   },
   async create(req, res) {
     const isPublished = req.body.status === "published";

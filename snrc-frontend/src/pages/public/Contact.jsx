@@ -398,7 +398,13 @@ export default function Contact() {
               </div>
 
               {feedback ? (
-                <p className="text-sm font-medium text-snrc-blue">{feedback}</p>
+                <p
+                  role="status"
+                  aria-live="polite"
+                  className="text-sm font-medium text-snrc-blue"
+                >
+                  {feedback}
+                </p>
               ) : null}
 
               <button

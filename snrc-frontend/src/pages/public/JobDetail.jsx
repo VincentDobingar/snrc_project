@@ -212,7 +212,11 @@ export default function JobDetail() {
             </h2>
 
             {success ? (
-              <p className="mt-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+              <p
+                role="status"
+                aria-live="polite"
+                className="mt-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700"
+              >
                 {feedback}
               </p>
             ) : (
@@ -343,7 +347,13 @@ export default function JobDetail() {
                 </div>
 
                 {feedback ? (
-                  <p className="text-sm font-medium text-snrc-red">{feedback}</p>
+                  <p
+                    role="status"
+                    aria-live="polite"
+                    className="text-sm font-medium text-snrc-red"
+                  >
+                    {feedback}
+                  </p>
                 ) : null}
 
                 <button

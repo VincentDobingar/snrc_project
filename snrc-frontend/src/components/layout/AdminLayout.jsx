@@ -1,5 +1,12 @@
 import { Suspense } from "react";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import {
+  Link,
+  matchPath,
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import {
   Briefcase,
   FileText,
@@ -41,10 +48,16 @@ const navItems = [
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const visibleNavItems = navItems.filter(
     (item) => !item.roles || item.roles.includes(user?.role)
   );
+
+  const activeNavItem = navItems.find((item) =>
+    matchPath({ path: item.to, end: item.end ?? false }, location.pathname)
+  );
+  const pageTitle = activeNavItem?.label || "Tableau de bord";
 
   async function handleLogout() {
     await logout();
@@ -122,7 +135,7 @@ export default function AdminLayout() {
             <div className="flex h-20 items-center justify-between px-6 lg:px-8">
               <div>
                 <h1 className="font-display text-2xl font-bold text-snrc-blue">
-                  Tableau de bord
+                  {pageTitle}
                 </h1>
                 <p className="text-sm text-snrc-blue/70">
                   Espace d’administration SNRC

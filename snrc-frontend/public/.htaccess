@@ -25,7 +25,7 @@
 
   # Politique de sécurité du contenu : n'autorise que les ressources du site
   # lui-même et l'API SNRC (api.snrc.td) pour les scripts, images, appels réseau, etc.
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://api.snrc.td; font-src 'self' data:; media-src 'self' https://api.snrc.td; connect-src 'self' https://api.snrc.td; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://api.snrc.td; font-src 'self' data: https://fonts.gstatic.com; media-src 'self' https://api.snrc.td; connect-src 'self' https://api.snrc.td; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
 
   # Retire les en-têtes qui révèlent la technologie serveur sous-jacente
   Header unset X-Powered-By

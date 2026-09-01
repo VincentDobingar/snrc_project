@@ -28,17 +28,7 @@ import {
 import usePageMeta from "../../hooks/usePageMeta";
 import { getNews } from "../../api/newsApi";
 import { resolveMediaUrl, formatDate } from "../../utils/media";
-
-/* -------------------------------------------------------
-   Composant local pour éviter l’erreur d’import "@/..."
-------------------------------------------------------- */
-function Container({ children, className = "" }) {
-  return (
-    <div className={`mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 ${className}`}>
-      {children}
-    </div>
-  );
-}
+import Container from "../../components/ui/Container";
 
 /* -------------------------------------------------------
    Animations
@@ -188,16 +178,19 @@ const services = [
 
 const governanceItems = [
   {
+    icon: ShieldCheck,
     title: "Transparence",
     description:
       "Une démarche fondée sur la traçabilité, la redevabilité et la fiabilité de l’information.",
   },
   {
+    icon: BarChart3,
     title: "Performance",
     description:
       "Des indicateurs de suivi pour mesurer les résultats et améliorer les actions de recouvrement.",
   },
   {
+    icon: Scale,
     title: "Conformité",
     description:
       "Des actions alignées sur le cadre légal, administratif et institutionnel en vigueur.",
@@ -435,10 +428,12 @@ function NewsGallerySlideshow() {
         setItems([...discoursVideos, ...newsSlides]);
       })
       .catch((error) => {
-        console.warn(
-          "Impossible de charger les actualités pour la page d'accueil",
-          error
-        );
+        if (import.meta.env.DEV) {
+          console.warn(
+            "Impossible de charger les actualités pour la page d'accueil",
+            error
+          );
+        }
         if (!cancelled) setItems([...discoursVideos]);
       })
       .finally(() => {
@@ -543,6 +538,8 @@ export default function Home() {
   const [emblemOk, setEmblemOk] = useState(true);
 
   useEffect(() => {
+    if (heroSlides.length <= 1) return undefined;
+
     const interval = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % heroSlides.length);
     }, 6500);
@@ -772,21 +769,23 @@ export default function Home() {
           </div>
         </Container>
 
-        <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 gap-2">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => setActiveSlide(index)}
-              className={`h-2.5 rounded-full transition-all ${
-                activeSlide === index
-                  ? "w-10 bg-white"
-                  : "w-2.5 bg-white/40 hover:bg-white/70"
-              }`}
-              aria-label={`Aller au slide ${index + 1}`}
-            />
-          ))}
-        </div>
+        {heroSlides.length > 1 && (
+          <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setActiveSlide(index)}
+                className={`h-2.5 rounded-full transition-all ${
+                  activeSlide === index
+                    ? "w-10 bg-white"
+                    : "w-2.5 bg-white/40 hover:bg-white/70"
+                }`}
+                aria-label={`Aller au slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* CHIFFRES CLÉS */}
@@ -1033,17 +1032,15 @@ export default function Home() {
                       onError={() => setDgImageOk(false)}
                     />
                   ) : (
+                    /* Emplacement attendu du fichier : public/images/direction/dg-snrc.jpg
+                       (servi depuis la racine, donc sans le préfixe "/public") */
                     <div className="flex h-[560px] w-full flex-col items-center justify-center bg-gradient-to-br from-blue-900 to-slate-950 p-8 text-center">
                       <Users size={72} className="mb-6 text-blue-200" />
                       <h3 className="text-2xl font-black">
                         Espace photo DG
                       </h3>
                       <p className="mt-3 max-w-sm text-sm leading-6 text-blue-100">
-                        Ajoute l’image de la Directrice Générale ici :
-                        <br />
-                        <span className="font-bold">
-                          /public/images/direction/dg-snrc.jpg
-                        </span>
+                        Photo indisponible pour le moment.
                       </p>
                     </div>
                   )}
@@ -1239,6 +1236,36 @@ export default function Home() {
             </p>
           </motion.div>
 
+          {/* Piliers de gouvernance */}
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="mt-12 grid gap-6 sm:grid-cols-3"
+          >
+            {governanceItems.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <motion.div
+                  key={item.title}
+                  variants={fadeUp}
+                  className="rounded-[1.5rem] border border-white/15 bg-white/10 p-6 text-center backdrop-blur"
+                >
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white">
+                    <Icon size={24} />
+                  </div>
+                  <h3 className="mt-4 text-lg font-black text-white">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-blue-50">
+                    {item.description}
+                  </p>
+                </motion.div>
+              );
+            })}
+          </motion.div>
 
           {/* Cartes professionnelles */}
           <motion.div

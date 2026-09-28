@@ -17,6 +17,12 @@ jobs:
     defaults:
       run:
         working-directory: snrc-backend
+    # Valeurs factices : src/config/env.js refuse de charger sans secrets (il n'y
+    # a pas de .env en CI) et la base est mockée dans les tests. Ne pas y mettre
+    # de vrais secrets.
+    env:
+      DB_PASSWORD: ci-only-not-a-real-password
+      JWT_SECRET: ci-only-jwt-secret-not-used-anywhere-else-0123456789
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

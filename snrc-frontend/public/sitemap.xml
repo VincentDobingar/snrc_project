@@ -46,6 +46,21 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://snrc.td/actualites/assemblee-generale-snrc-25-septembre-2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://snrc.td/actualites/installation-officielle-du-nouveau-president-du-conseil-d-administration-de-la-snrc</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://snrc.td/actualites/nomination-a-la-presidence-du-conseil-d-administration-de-la-snrc</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://snrc.td/actualites/ceremonie-officielle-de-lancement-des-activites-de-la-snrc-a-n-djamena</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

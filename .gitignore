@@ -35,3 +35,6 @@ Thumbs.db
 
 # Script d'exploitation ponctuel avec identifiants d'hébergement en dur
 snrc-backend/sql/sql.sql
+
+# Archives de release générées pour cPanel
+release/
